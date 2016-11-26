@@ -1,16 +1,7 @@
-import time
-import socket
-import struct
-import select
-import random
-import asyncore
 import sys
 import getopt
-import time
 import itertools
 from itertools import product
-from string import ascii_lowercase
-from threading import Thread
 from collections import defaultdict
 
 
@@ -447,9 +438,9 @@ for arg in sys.argv:
 		print "Parameters:"
 		print "-d\t\tDebug Mode"
 		sys.exit()
-	elif arg == '-d':
+	if arg == '-d':
 		_DEBUG_ = 1
-	elif arg == '-t':
+	if arg == '-t':
 		testFunctions()
 		sys.exit()		
 main()
