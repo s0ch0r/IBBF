@@ -23,25 +23,25 @@ class Lstar:
 	"""
 	Tests if the Table is consistent, returns '' if yes and the value of s_1 and s_2 if not
 	"""
-	def testTableConsistent():
+	def testTableConsistent(self):
 
-		keys = S.keys()
+		keys = self.S.keys()
 		
 		# Search for identical rows
 		for i in range(0, len(keys)):
 			for j in range(i+1, len(keys)):
-				if S[keys[i]] == S[keys[j]]:
+				if self.S[keys[i]] == self.S[keys[j]]:
 					
 					# if found, test if row(s_1 + a) == row(s_2 + a) 
-					for a in A:
-						if (keys[i]+a) in S:
-							s_1 = S[keys[i]+a]
+					for a in self.A:
+						if (keys[i]+a) in self.S:
+							s_1 = self.S[keys[i]+a]
 						else:
-							s_1 = SA[keys[i]+a]
-						if (keys[j]+a) in S:
-							s_2 = S[keys[j]+a]
+							s_1 = self.SA[keys[i]+a]
+						if (keys[j]+a) in self.S:
+							s_2 = self.S[keys[j]+a]
 						else:
-							s_2 = SA[keys[j]+a]
+							s_2 = self.SA[keys[j]+a]
 
 						# if not the same return the inconsistent values
 						if s_1 != s_2:
@@ -53,21 +53,21 @@ class Lstar:
 	"""
 	Fixes a table which is not consistent, returns 1 on success and 0 on failure
 	"""
-	def fixTableInconsistent(s):
+	def fixTableInconsistent(self,s):
 
 		# Search for suitable canditates of a and e to fix the inconsistency of the given values s_1, s_2
-		for a in A:
-			for e in E:
-				if membershipQuery(s[0]+a+e) is not membershipQuery(s[1]+a+e):
+		for a in self.A:
+			for e in self.E:
+				if self.membershipQuery(s[0]+a+e) is not self.membershipQuery(s[1]+a+e):
 					
 					# add suitable value (ae) to E
-					E.append(a+e)
+					self.E.append(a+e)
 
 					# Fill new collumn with membership queries
-					for key in S:
-						S[key] += membershipQuery(key+a+e)
-					for key in SA:
-						SA[key] += membershipQuery(key+a+e)
+					for key in self.S:
+						self.S[key] += self.membershipQuery(key+a+e)
+					for key in self.SA:
+						self.SA[key] += self.membershipQuery(key+a+e)
 					return 1
 		return 0
 
@@ -166,7 +166,7 @@ class Lstar:
 	"""
 	Prints a visual representation of a given DFSM
 	"""
-	def printDFSM(DFSM):
+	def printDFSM(self,DFSM):
 
 		initState = DFSM[0]
 		finiteStates = DFSM[1]
@@ -174,23 +174,23 @@ class Lstar:
 
 		# parse headline
 		headline = "\ntransition table"
-		for i in range(0, len(A)):
-			headline += "| " + A[i] + "\t"
+		for i in range(0, len(self.A)):
+			headline += "| " + self.A[i] + "\t"
 
 		# parse line
 		line = ""
-		for i in range(0, len(A) + 2):
+		for i in range(0, len(self.A) + 2):
 			line += "--------"
 
 		# parse content
 		body = ""
 		for key in ttable:
 			body += " " + key + "\t-->\t"
-			for i in range(0, len(A)):
+			for i in range(0, len(self.A)):
 				body += "| " + ttable[key][i] + "\t"
 			body += "\n"
 
-		if _DEBUG_:
+		if self._DEBUG_:
 			print "\n\n################################################\nTable is closed and consistent - construct DFSM:\n################################################"
 		
 		print headline
@@ -205,7 +205,7 @@ class Lstar:
 	"""
 	Generates x examples, if no counterexample was found the given DFSM, by chance, is correct
 	"""
-	def askTeacher(DFSM):
+	def askTeacher(self,DFSM):
 
 		initState = DFSM[0]
 		finiteStates = DFSM[1]
@@ -216,12 +216,12 @@ class Lstar:
 		stateTransTable.clear()
 
 		for key in ttable:
-			for i in range(0, len(A)):
-				stateTransTable[key+":"+A[i]] = ttable[key][i]
+			for i in range(0, len(self.A)):
+				stateTransTable[key+":"+self.A[i]] = ttable[key][i]
 
 		# Generate examples and query them
 		for i in range(1,5):
-			examples = itertools.product(A, repeat = i)
+			examples = itertools.product(self.A, repeat = i)
 			for example in examples:
 				
 				# Calculate membership according to own DFSM
@@ -235,7 +235,7 @@ class Lstar:
 					answer = '0'
 				
 				# Compare
-				if answer != membershipQuery(''.join(example)):
+				if answer != self.membershipQuery(''.join(example)):
 					return ''.join(example)
 		
 		return ''
@@ -244,7 +244,7 @@ class Lstar:
 	"""
 	Constructs a DFSM candidate and does a conjecture query
 	"""
-	def conjectureQuery():
+	def conjectureQuery(self):
 
 		states = []
 		ttable = defaultdict(list)
@@ -253,11 +253,11 @@ class Lstar:
 		mapping = {'':'q0'}
 
 		# parse different states
-		for key in S:
-			states.append([key,S[key]])
+		for key in self.S:
+			states.append([key,self.S[key]])
 			for i in range(0, len(states)-1):
 				if states[i][1] == states[len(states)-1][1]:
-					states.remove([key,S[key]])
+					states.remove([key,self.S[key]])
 					break
 
 		# make state transition table
@@ -266,11 +266,11 @@ class Lstar:
 			if states[i][0] == '':
 				initState = states[i][0]
 
-			for a in A:
-				if (states[i][0] + a) in SA:
-					row = SA[states[i][0] + a]
-				elif (states[i][0] + a) in S:
-					row = S[states[i][0] + a]
+			for a in self.A:
+				if (states[i][0] + a) in self.SA:
+					row = self.SA[states[i][0] + a]
+				elif (states[i][0] + a) in self.S:
+					row = self.S[states[i][0] + a]
 				for j in range(0, len(states)):
 					if row == states[j][1]:
 						ttable[states[i][0]].append(states[j][0])
@@ -296,7 +296,7 @@ class Lstar:
 			finiteStates[i] = mapping[finiteStates[i]]
 
 		for key in ttable:
-			for i in range(0, len(A)):
+			for i in range(0, len(self.A)):
 				ttable[key][i] = mapping[ttable[key][i]]
 		
 		for key in ttable:
@@ -306,16 +306,16 @@ class Lstar:
 		DFSM = [initState, finiteStates, ttable_new]
 
 		# ask for counterexample
-		if _DEBUG_:
-			printDFSM(DFSM)
-		counterexample = askTeacher(DFSM)
+		if self._DEBUG_:
+			self.printDFSM(DFSM)
+		counterexample = self.askTeacher(DFSM)
 
 		return counterexample, DFSM
 
 	"""
 	Adds a given counterexample to the Table
 	"""
-	def addCounterexample(counterexample):
+	def addCounterexample(self,counterexample):
 		
 		strings = []
 		
@@ -326,31 +326,31 @@ class Lstar:
 
 		# Add values to S (and their corresponding ones to SA) if they are not already there
 		for i in range(0, len(strings)):
-			if strings[i] not in S:
-				S[strings[i]] = queryRow(strings[i])
-				for a in A:
-					SA[strings[i]+a] = queryRow(strings[i]+a)
+			if strings[i] not in self.S:
+				self.S[strings[i]] = self.queryRow(strings[i])
+				for a in self.A:
+					self.SA[strings[i]+a] = self.queryRow(strings[i]+a)
 		
 		# Remove duplicate values
-		for key in S:
-			if key in SA:
-				del SA[key]
+		for key in self.S:
+			if key in self.SA:
+				del self.SA[key]
 
 		return 1
 
 	"""
 	Prints a visual representation of the Table (S,E,T)
 	"""
-	def printTable(description):
+	def printTable(self,description):
 		
-		if _DEBUG_:
+		if self._DEBUG_:
 
 			print "\n\n################################################\n" + description + "\n################################################"
 
 			# Construct Headline with set E
 			headline = "\n T\t|  \t"
-			for i in range(1, len(E)):
-				headline += "| " + E[i] + "\t"
+			for i in range(1, len(self.E)):
+				headline += "| " + self.E[i] + "\t"
 			print headline
 
 			# Construct line
@@ -360,11 +360,11 @@ class Lstar:
 			print line
 
 			# Construct S
-			keys = S.keys()
+			keys = self.S.keys()
 			Alines = ""
 			for i in range(0, len(keys)):
 				Alines += keys[i] + "\t"
-				row = list(S[keys[i]])
+				row = list(self.S[keys[i]])
 				for j in range(0, len(row)):
 					Alines += "| " + row[j] + "\t"
 				if i+1 < len(keys):
@@ -373,11 +373,11 @@ class Lstar:
 			print line
 
 			# Construct SA
-			keys = SA.keys()
+			keys = self.SA.keys()
 			Blines = ""
 			for i in range(0, len(keys)):
 				Blines += keys[i] + "\t"
-				row = list(SA[keys[i]])
+				row = list(self.SA[keys[i]])
 				for j in range(0, len(row)):
 					Blines += "| " + row[j] + "\t"
 				Blines += "\n"
@@ -388,40 +388,40 @@ class Lstar:
 	"""
 	Implements the l* algorithm, returns a DFSM
 	"""
-	def main():
+	def main(self):
 
 		# Make initial table with S, E and lambda
-		for key in S:
-			S[key] = queryRow(key)
-		for key in SA:
-			SA[key] = queryRow(key)
+		for key in self.S:
+			self.S[key] = self.queryRow(key)
+		for key in self.SA:
+			self.SA[key] = self.queryRow(key)
 		
-		printTable("Initial table:")
+		self.printTable("Initial table:")
 
 		while(42==42):
 			while(42==42):
 				
-				tmp = testTableClosed()
+				tmp = self.testTableClosed()
 				if tmp is not "":
-					fixTableNotClosed(tmp)
-					printTable("Table after making it closed:")
+					self.fixTableNotClosed(tmp)
+					self.printTable("Table after making it closed:")
 					continue
 				
-				tmp = testTableConsistent()
+				tmp = self.testTableConsistent()
 				if tmp is not "":
-					fixTableInconsistent(tmp)
-					printTable("Table after making it consistent:")
+					self.fixTableInconsistent(tmp)
+					self.printTable("Table after making it consistent:")
 					continue
 				break
 		
-			counterexample, DFSM = conjectureQuery()
+			counterexample, DFSM = self.conjectureQuery()
 			if counterexample is not "":
-				addCounterexample(counterexample)
-				printTable(("Table after a counterexample \"" + counterexample + "\" was added:"))
+				self.addCounterexample(counterexample)
+				self.printTable(("Table after a counterexample \"" + counterexample + "\" was added:"))
 				continue
 			break
 		
 		print "\n\n##################################\n# L* terminated succesfully!! :) #\n##################################"
-		printDFSM(DFSM)
+		self.printDFSM(DFSM)
 		return 1 
 
