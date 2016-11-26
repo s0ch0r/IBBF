@@ -2,9 +2,10 @@
 
 **Implements the l*-algorithm**
 
-**Usage**  |    
-  ------------- | -------------
-  python lstar,py  | Standard Mode  
+**Usage** 
+*Parameter*           | *Effect*  
+  ------------------- | -----------------
+  python lstar,py     | Standard Mode  
   python lstar.py -d  | Debug Mode
   python lstar.py -t  | Test Mode
 
