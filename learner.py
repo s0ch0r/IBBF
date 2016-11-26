@@ -14,7 +14,7 @@ SA = {'0': '', '1': ''}
 
 
 """
-Tests if the Table is consistent, returns 0 if yes and the value of s_1 and s_2 if not
+Tests if the Table is consistent, returns '' if yes and the value of s_1 and s_2 if not
 """
 def testTableConsistent():
 
@@ -65,10 +65,10 @@ def fixTableInconsistent(s):
 	return 0
 
 """
-Test if the table is closed, returns 0 if yes and the value if not
+Test if the table is closed, returns '' if yes and the value if not
 """
 def testTableClosed():
-	
+
 	found = 0	
 	
 	# Validate if all rows in SA are also rows in S
@@ -422,14 +422,110 @@ def main():
 Tests the implemented functions
 """
 def testFunctions():
+	
+	print "Start Testing ... \n"
+	errors = "\n"
 
-	# Test function testTableClosed()
-	# Test function fixTableNotClosed()
-	# Test function testTableConsistent()
-	# Test function fixTableInconsistent()
-	# Test function conjectureQuery()
-	# Test function askTeacher()
-	# Test function addCounterexample()
+	global A
+	global E
+	global S
+	global SA
+
+	#########################################
+	# Test function testTableClosed()	#
+	#########################################
+	function = "testTableClosed()"
+
+	# Testcase 1
+	testcase = '1.1'
+
+	A = ['0','1']
+	E = ['',]
+	S = {'':'1'}
+	SA = {'0':'0', '1':'0'}
+
+	answer = testTableClosed()
+	expected = ['0','1']
+
+	if answer not in expected:
+		print "Fail"
+		errors += "Failure in function \"" + function + "\": Expected \"" + str(expected) + "\" but was \"" + answer + "\" \t(" + testcase + ")\n"
+	else:
+		print "Success"
+
+	
+	# Testcase 2
+	testcase = '1.2'
+
+	A = ['0','1']
+	E = ['',]
+	S = {'':'0'}
+	SA = {'0':'0', '1':'0'}	
+	
+	answer = testTableClosed()
+	expected = ''
+	if answer not in expected:
+		print "Fail"
+		errors += "Failure in function \"" + function + "\": Expected \"" + str(expected) + "\" but was \"" + answer + "\" \t(" + testcase + ")\n"
+	else:
+		print "Success"
+
+
+	#########################################
+	# Test function fixTableNotClosed()	#
+	#########################################
+	function = "fixTableNotClosed()"
+
+	#Testcase 1
+
+
+	#########################################
+	# Test function testTableConsistent()	#
+	#########################################
+	function = "testTableConsistent()"
+
+	#Testcase 1
+
+
+	#########################################
+	# Test function fixTableInconsistent()	#
+	#########################################
+	function = "fixTableConsistent()"
+
+	#Testcase 1
+	
+	
+	#########################################
+	# Test function conjectureQuery()	#
+	#########################################
+	function = "conjectureQuery()"
+	
+	#Testcase 1
+	
+	
+	#########################################
+	# Test function askTeacher()		#
+	#########################################
+	function = "askTeacher()"
+	
+	#Testcase 1
+	
+	
+	#########################################
+	# Test function addCounterexample()	#
+	#########################################
+	function = "addCounterexample()"
+	
+	#Testcase 1
+
+
+	
+	# print out details about failed tests
+	if errors != '\n':
+		print errors
+	else:
+		print "\nPassed all tests succesfully!!"
+
 	return 1
 
 # Parse arguments
