@@ -5,10 +5,11 @@ class TestLstar:
 	#def __init__(self):
 		# Nothing to do here
 
-	def testFunction(self):
+	def testFunction(self,testInstance):
+		
 		print "Start Testing ... \n"
 		errors = "\n"
-		lstarTest = lstarModule.Lstar()
+		lstarTest = testInstance
 
 		#########################################
 		# Test function testTableClosed()	#

@@ -2,6 +2,7 @@ import sys
 import getopt
 import itertools
 import importlib
+import re
 from itertools import product
 from collections import defaultdict
 
@@ -14,10 +15,28 @@ class Lstar:
 		
 		self._DEBUG_ = 0
 
+		self.regex = 0
+		self.maxWordLength = 5
+
 		self.A = ['0','1']
 		self.SA = {'0': '', '1': ''}
 		self.S = {'':''}
 		self.E = ['', ]
+
+	
+	""" 
+	Sets a new alphabet and initialises S and SA
+	"""
+	def setAlphabet(self, newA):
+	
+		self.SA.clear()
+		self.A = newA
+		for a in self.A:
+			self.SA[a] = ''
+
+		self.printTable("Test")
+		return 1
+
 
 
 	"""
@@ -125,7 +144,11 @@ class Lstar:
 	"""
 	def membershipQuery(self, teststring):
 
-		
+		if self.regex.match(teststring):
+			return '1'
+		else:
+			return '0'
+
 		"""		
 		# Returns 1 if the number of 1 and 0 both are even
 		if (teststring == ''):
@@ -148,7 +171,7 @@ class Lstar:
 			return '0'
 
 
-		"""
+
 		# Returns 1 if the number of 1 is 3 (modulo 4)
 		if (teststring == ''):
 			return '0'
@@ -161,7 +184,7 @@ class Lstar:
 			return '1'
 		else:
 			return '0'
-		
+		"""	
 		
 	"""
 	Prints a visual representation of a given DFSM
@@ -220,7 +243,7 @@ class Lstar:
 				stateTransTable[key+":"+self.A[i]] = ttable[key][i]
 
 		# Generate examples and query them
-		for i in range(1,5):
+		for i in range(1,self.maxWordLength+1):
 			examples = itertools.product(self.A, repeat = i)
 			for example in examples:
 				
