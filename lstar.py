@@ -2,6 +2,7 @@ import lstarModule
 import testLstar
 import sys
 import re
+import time
 
 def main():
 
@@ -34,7 +35,10 @@ def main():
 	if _TEST_ == 1:
 		testInstance = testLstar.TestLstar()
 		testInstance.testFunction(lstarInstance)
-	else:
+	else:	
+		# Start with timer
+		start_time = time.time()
 		lstarInstance.main()
+		print("\nExecution time: %s seconds " % (time.time() - start_time))
 
 main()

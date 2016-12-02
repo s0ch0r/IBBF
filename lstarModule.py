@@ -95,7 +95,7 @@ class Lstar:
 	"""
 	def testTableClosed(self):
 
-		found = 0	
+		#found = 0	
 		
 		# Validate if all rows in SA are also rows in S
 		for key_SA in self.SA:
