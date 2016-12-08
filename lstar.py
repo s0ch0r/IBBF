@@ -1,44 +1,114 @@
-import lstarModule
-import testLstar
 import sys
+import getopt
+import itertools
+import importlib
 import re
+import imp
+from itertools import product
+from collections import defaultdict
 import time
 
-def main():
+# Own Modules
+#sys.path.append('MQModules')
+#import regexMQ
+#sys.path.append('CQModules')
+#import basicCQ
+#sys.path.append('TableModules')
+#import basicTable
 
-	lstarInstance = lstarModule.Lstar()
+"""
+Implements the l* algorithm, returns a DFSM
+"""
+def main(CQModule, MQModule, TModule, A, regex, debugFlag, length):
+
+	# Init Modules
+	sys.path.append('MQModules')
+	MQModule = (importlib.import_module(MQModule)).MQModule(regex,debugFlag)
+	sys.path.append('TableModules')
+	tableModule = (importlib.import_module(TModule)).TableModule(MQModule, A, debugFlag)
+	sys.path.append('CQModules')
+	CQModule = (importlib.import_module(CQModule)).CQModule(MQModule, tableModule, debugFlag, length)
+
+	# Algorithm
+	while(42==42):
+		
+		tableModule.fixTable()
+		DFSM = tableModule.getDFSM()
+		counterexample = CQModule.isCorrect(DFSM)
+		
+		if counterexample is not "":
+			tableModule.addCounterexample(counterexample)
+			continue
+		break
+		
+	print "\n\n##################################\n# L* terminated succesfully!! :) #\n##################################"
+	return 1 
+
+
+def printHelp():
+	print "Parameters:"
+	print "-d\t\tDebug Mode"
+	print "-t\t\tTest Mode"
+	print "-r\t\tRegex"
+	print "-A\t\tAlphabet (eg \"abcdef\")"
+	print "-l\t\tMaxLength of Strings (only for basicCQ-Module)"
+	print "-CQ\t\tConjecture Query - Module to be used"
+	print "-MQ\t\tMembership Query - Module to be used"
+	print "-TM\t\tTable - Module to be used"
+	sys.exit()
+
+def parseParameters():
+
 	_TEST_ = 0
+	_DEBUG_ = 0
+	length = 5	# Only for basicCQ module
+	A = ""
+	regex = ""
+	CQModuleName = "basicCQ"
+	MQModuleName = "regexMQ"
+	TModuleName = "basicTable"
 
 	# Parse arguments
 	for i in range(1, len(sys.argv)):
 		if sys.argv[i] == '-h':
-			print "Parameters:"
-			print "-d\t\tDebug Mode"
-			print "-t\t\tTest Mode"
-			sys.exit()
+			printHelp()
+
 		if sys.argv[i] == '-d':
-			lstarInstance._DEBUG_ = 1
+			_DEBUG_ = 1
 
 		if sys.argv[i] == '-t':
 			_TEST_ = 1
 
 		if sys.argv[i] == '-r':
 			regex = re.compile(sys.argv[i+1])
-			lstarInstance.regex = regex
-
+			
 		if sys.argv[i] == '-A':
-			lstarInstance.setAlphabet(list(sys.argv[i+1]))
+			A = list(sys.argv[i+1])
 
 		if sys.argv[i] == '-l':
-			lstarInstance.maxWordLength = int(sys.argv[i+1])
+			length = int(sys.argv[i+1])
+		
+		if sys.argv[i] == '-CQ':
+			CQModuleName = sys.argv[i+1]
+		
+		if sys.argv[i] == '-MQ':
+			MQModuleName = sys.argv[i+1]
 
+		if sys.argv[i] == '-TM':
+			TModuleName = sys.argv[i+1]
+
+	
+	# Test parameter
+	if A == "" or regex == "":
+		printHelp()
+	
 	if _TEST_ == 1:
-		testInstance = testLstar.TestLstar()
-		testInstance.testFunction(lstarInstance)
+		print "Test Mode currently not available"
 	else:	
 		# Start with timer
 		start_time = time.time()
-		lstarInstance.main()
+		main(CQModuleName, MQModuleName, TModuleName, A, regex, _DEBUG_, length)
 		print("\nExecution time: %s seconds " % (time.time() - start_time))
 
-main()
+
+parseParameters()

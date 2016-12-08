@@ -6,22 +6,26 @@ import re
 from itertools import product
 from collections import defaultdict
 
-class Lstar:
+class TableModule:
 
 	"""
 	Init lstar instance
 	"""
-	def __init__(self):
+	def __init__(self, MQModule, A, debugFlag):
 		
-		self._DEBUG_ = 0
+		self._DEBUG_ = debugFlag
+		self.MQModule = MQModule
 
-		self.regex = 0
-		self.maxWordLength = 5
-
-		self.A = ['0','1']
-		self.SA = {'0': '', '1': ''}
-		self.S = {'':''}
+		self.A = ['', ]
+		self.SA = {'': ''}
+		self.S = {'': self.membershipQuery('')}
 		self.E = ['', ]
+		
+		self.setAlphabet(A)
+
+		self.printTable("Initial Table")
+
+
 
 	
 	""" 
@@ -32,12 +36,29 @@ class Lstar:
 		self.SA.clear()
 		self.A = newA
 		for a in self.A:
-			self.SA[a] = ''
+			self.SA[a] = self.membershipQuery(a)
 
-		self.printTable("Test")
 		return 1
 
 
+	"""
+	Fixes Table so it is closed and consistent
+	"""
+	def fixTable(self):
+
+		while(42==42):
+			answer = self.testTableClosed()
+			if answer != "":
+				self.fixTableNotClosed(answer)
+				self.printTable("Table after closing it")
+				continue
+			answer = self.testTableConsistent()
+			if answer != "":
+				self.fixTableInconsistent(answer)
+				self.printTable("Table after fixing inconsistency")
+				continue
+			return 1
+		return 0
 
 	"""
 	Tests if the Table is consistent, returns '' if yes and the value of s_1 and s_2 if not
@@ -144,130 +165,12 @@ class Lstar:
 	"""
 	def membershipQuery(self, teststring):
 
-		if self.regex.match(teststring):
-			return '1'
-		else:
-			return '0'
-
-		"""		
-		# Returns 1 if the number of 1 and 0 both are even
-		if (teststring == ''):
-			return '1'
-
-		testbinary = int('0b'+teststring, 2)
-
-		x = 0
-		y = 0
-
-		for i in range(0, len(teststring)):
-			if (testbinary & 1):
-				x += 1
-			else:
-				y += 1
-			testbinary >>= 1
-		if (x % 2 == 0) and (y % 2 == 0):
-			return '1'
-		else:
-			return '0'
-
-
-
-		# Returns 1 if the number of 1 is 3 (modulo 4)
-		if (teststring == ''):
-			return '0'
-		testbinary = int('0b'+teststring, 2)
-		x = 0
-		for i in range(0,len(teststring)):
-			x += (testbinary & 1)
-			testbinary >>= 1
-		if (x % 4 == 3):
-			return '1'
-		else:
-			return '0'
-		"""	
-		
-	"""
-	Prints a visual representation of a given DFSM
-	"""
-	def printDFSM(self,DFSM):
-
-		initState = DFSM[0]
-		finiteStates = DFSM[1]
-		ttable = DFSM[2]
-
-		# parse headline
-		headline = "\ntransition table"
-		for i in range(0, len(self.A)):
-			headline += "| " + self.A[i] + "\t"
-
-		# parse line
-		line = ""
-		for i in range(0, len(self.A) + 2):
-			line += "--------"
-
-		# parse content
-		body = ""
-		for key in ttable:
-			body += " " + key + "\t-->\t"
-			for i in range(0, len(self.A)):
-				body += "| " + ttable[key][i] + "\t"
-			body += "\n"
-
-		if self._DEBUG_:
-			print "\n\n################################################\nTable is closed and consistent - construct DFSM:\n################################################"
-		
-		print headline
-		print line
-		print body
-		print "\nInitial state: " + str(initState)
-		print "Final states: " + str(finiteStates)
-
-		return 1 
-
-
-	"""
-	Generates x examples, if no counterexample was found the given DFSM, by chance, is correct
-	"""
-	def askTeacher(self,DFSM):
-
-		initState = DFSM[0]
-		finiteStates = DFSM[1]
-		ttable = DFSM[2]
-
-		# Generate table for mapping state transitions
-		stateTransTable = {'':''}
-		stateTransTable.clear()
-
-		for key in ttable:
-			for i in range(0, len(self.A)):
-				stateTransTable[key+":"+self.A[i]] = ttable[key][i]
-
-		# Generate examples and query them
-		for i in range(1,self.maxWordLength+1):
-			examples = itertools.product(self.A, repeat = i)
-			for example in examples:
-				
-				# Calculate membership according to own DFSM
-				
-				answer = initState
-				for a in example:
-					answer = stateTransTable[answer+":"+a]
-				if answer in finiteStates:
-					answer = '1'
-				else:
-					answer = '0'
-				
-				# Compare
-				if answer != self.membershipQuery(''.join(example)):
-					return ''.join(example)
-		
-		return ''
-
+		return self.MQModule.isMember(teststring)
 
 	"""
 	Constructs a DFSM candidate and does a conjecture query
 	"""
-	def conjectureQuery(self):
+	def getDFSM(self):
 
 		states = []
 		ttable = defaultdict(list)
@@ -326,14 +229,9 @@ class Lstar:
 			ttable_new[mapping[key]] = ttable[key]
 
 		# make DFSM
-		DFSM = [initState, finiteStates, ttable_new]
+		DFSM = [initState, finiteStates, ttable_new, self.A]
 
-		# ask for counterexample
-		if self._DEBUG_:
-			self.printDFSM(DFSM)
-		counterexample = self.askTeacher(DFSM)
-
-		return counterexample, DFSM
+		return DFSM
 
 	"""
 	Adds a given counterexample to the Table
@@ -359,6 +257,8 @@ class Lstar:
 			if key in self.SA:
 				del self.SA[key]
 
+		self.printTable("Table after adding counterexample \"" + counterexample + "\"")
+		
 		return 1
 
 	"""
@@ -408,43 +308,4 @@ class Lstar:
 
 			return 1
 
-	"""
-	Implements the l* algorithm, returns a DFSM
-	"""
-	def main(self):
-
-		# Make initial table with S, E and lambda
-		for key in self.S:
-			self.S[key] = self.queryRow(key)
-		for key in self.SA:
-			self.SA[key] = self.queryRow(key)
-		
-		self.printTable("Initial table:")
-
-		while(42==42):
-			while(42==42):
-				
-				tmp = self.testTableClosed()
-				if tmp is not "":
-					self.fixTableNotClosed(tmp)
-					self.printTable("Table after making it closed:")
-					continue
-				
-				tmp = self.testTableConsistent()
-				if tmp is not "":
-					self.fixTableInconsistent(tmp)
-					self.printTable("Table after making it consistent:")
-					continue
-				break
-		
-			counterexample, DFSM = self.conjectureQuery()
-			if counterexample is not "":
-				self.addCounterexample(counterexample)
-				self.printTable(("Table after a counterexample \"" + counterexample + "\" was added:"))
-				continue
-			break
-		
-		print "\n\n##################################\n# L* terminated succesfully!! :) #\n##################################"
-		self.printDFSM(DFSM)
-		return 1 
 
