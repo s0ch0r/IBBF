@@ -1,6 +1,6 @@
-IBBF - Intelligent Blackbox Fuzzer
+# IBBF - Intelligent Blackbox Fuzzer
 
-The IBBF is an implementation of the L*-Algorithm.
+**The IBBF is an implementation of the L*-Algorithm.**
 
 #### Run with following parameters:
 ```
