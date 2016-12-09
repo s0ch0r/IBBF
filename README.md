@@ -6,10 +6,10 @@
 ```
 -d                  Debug Mode
 -t                  Test Mode
--A [alphabet]       Set of characters which will represent the Alphabet used by the algorithm                    (e.g. "abc@ef")
--CQ [module_name]   use a different module for conjecture queries. The file has to be located                    in the corresponding subfolder. 
--MQ [module_name]   use a different module for membership queries. The file has to be located                    in the corresponding subfolder. 
--TM [module_name]   use a different module for handling the table. The file has to be located                    in the corresponding subfolder. 
+-A [alphabet]       Set of characters which will represent the Alphabet used by the algorithm (e.g. "abc@ef")
+-CQ [module_name]   use a different module for conjecture queries. The file has to be located in the corresponding subfolder. 
+-MQ [module_name]   use a different module for membership queries. The file has to be located in the corresponding subfolder. 
+-TM [module_name]   use a different module for handling the table. The file has to be located in the corresponding subfolder. 
 ```
 ### Current Modules:
 ##### Conjecture Query:
