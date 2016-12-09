@@ -1,19 +1,18 @@
-import itertools
+import random
 
 class CQModule:
 
 	"""
 	Init lstar instance
 	"""
-	def __init__(self, MQModule, TableModule, debugFlag, length):
+	def __init__(self, MQModule, TableModule, debugFlag, tries):
 		
 		self._DEBUG_ = debugFlag
 
 		self.MQModule = MQModule
 		self.TableModule = TableModule
 
-		self.maxWordLength = length
-
+		self.tries = tries
 
 	"""
 	Prints a visual representation of a given DFSM
@@ -85,25 +84,27 @@ class CQModule:
 				stateTransTable[key+":"+A[i]] = ttable[key][i]
 
 		# Generate examples and query them
-		for i in range(1, self.maxWordLength+1):
-			examples = itertools.product(A, repeat=i)
-			for example in examples:
+		for i in range(0, self.tries):
+
+			# Generate random example
+			example = []
+			for j in range(0, random.randint(0, 50)):
+				example.append(A[random.randint(0, len(A)-1)])
 				
-				# Calculate membership according to own DFSM
+			# Calculate membership according to own DFSM
+			answer = initState
+			for a in example:
+				answer = stateTransTable[answer+":"+a]
+			if answer in finiteStates:
+				answer = '1'
+			else:
+				answer = '0'
 				
-				answer = initState
-				for a in example:
-					answer = stateTransTable[answer+":"+a]
-				if answer in finiteStates:
-					answer = '1'
-				else:
-					answer = '0'
-				
-				# Compare
-				if answer != self.membershipQuery(''.join(example)):
-					if self._DEBUG_:
-						self.printDFSM(DFSM, "Following is not the correct DFSM")
-					return ''.join(example)
+			# Compare
+			if answer != self.membershipQuery(''.join(example)):
+				if self._DEBUG_:
+					self.printDFSM(DFSM, "Following is not the correct DFSM")
+				return ''.join(example)
 		
 		self.printDFSM(DFSM, "Following is the correct DFSM")
 		return ''

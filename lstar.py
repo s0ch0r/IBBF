@@ -1,20 +1,6 @@
 import sys
-import getopt
-import itertools
 import importlib
-import re
-import imp
-from itertools import product
-from collections import defaultdict
 import time
-
-# Own Modules
-#sys.path.append('MQModules')
-#import regexMQ
-#sys.path.append('CQModules')
-#import basicCQ
-#sys.path.append('TableModules')
-#import basicTable
 
 """
 Implements the l* algorithm, returns a DFSM
@@ -23,14 +9,14 @@ def main(CQModule, MQModule, TModule, A, regex, debugFlag, length):
 
 	# Init Modules
 	sys.path.append('MQModules')
-	MQModule = (importlib.import_module(MQModule)).MQModule(regex,debugFlag)
+	MQModule = (importlib.import_module(MQModule)).MQModule(regex, debugFlag)
 	sys.path.append('TableModules')
 	tableModule = (importlib.import_module(TModule)).TableModule(MQModule, A, debugFlag)
 	sys.path.append('CQModules')
 	CQModule = (importlib.import_module(CQModule)).CQModule(MQModule, tableModule, debugFlag, length)
 
 	# Algorithm
-	while(42==42):
+	while 42 == 42:
 		
 		tableModule.fixTable()
 		DFSM = tableModule.getDFSM()
@@ -61,7 +47,7 @@ def parseParameters():
 
 	_TEST_ = 0
 	_DEBUG_ = 0
-	length = 5	# Only for basicCQ module
+	length = 5  	# Only for basicCQ module
 	A = ""
 	regex = ""
 	CQModuleName = "basicCQ"
@@ -80,7 +66,7 @@ def parseParameters():
 			_TEST_ = 1
 
 		if sys.argv[i] == '-r':
-			regex = re.compile(sys.argv[i+1])
+			regex = sys.argv[i+1]
 			
 		if sys.argv[i] == '-A':
 			A = list(sys.argv[i+1])
@@ -97,7 +83,6 @@ def parseParameters():
 		if sys.argv[i] == '-TM':
 			TModuleName = sys.argv[i+1]
 
-	
 	# Test parameter
 	if A == "" or regex == "":
 		printHelp()

@@ -1,9 +1,3 @@
-import sys
-import getopt
-import itertools
-import importlib
-import re
-from itertools import product
 from collections import defaultdict
 
 class TableModule:
@@ -46,7 +40,7 @@ class TableModule:
 	"""
 	def fixTable(self):
 
-		while(42==42):
+		while 42 == 42:
 			answer = self.testTableClosed()
 			if answer != "":
 				self.fixTableNotClosed(answer)
@@ -85,7 +79,7 @@ class TableModule:
 
 						# if not the same return the inconsistent values
 						if s_1 != s_2:
-							return keys[i],keys[j]
+							return keys[i], keys[j]
 		return ""
 
 
@@ -93,7 +87,7 @@ class TableModule:
 	"""
 	Fixes a table which is not consistent, returns 1 on success and 0 on failure
 	"""
-	def fixTableInconsistent(self,s):
+	def fixTableInconsistent(self, s):
 
 		# Search for suitable canditates of a and e to fix the inconsistency of the given values s_1, s_2
 		for a in self.A:
@@ -115,8 +109,6 @@ class TableModule:
 	Test if the table is closed, returns '' if yes and the value if not
 	"""
 	def testTableClosed(self):
-
-		#found = 0	
 		
 		# Validate if all rows in SA are also rows in S
 		for key_SA in self.SA:
@@ -172,18 +164,20 @@ class TableModule:
 	"""
 	def getDFSM(self):
 
+		row = 0
+		initState = 0
 		states = []
 		ttable = defaultdict(list)
 		ttable_new = defaultdict(list)
 		finiteStates = []
-		mapping = {'':'q0'}
+		mapping = {'': 'q0'}
 
 		# parse different states
 		for key in self.S:
-			states.append([key,self.S[key]])
+			states.append([key, self.S[key]])
 			for i in range(0, len(states)-1):
 				if states[i][1] == states[len(states)-1][1]:
-					states.remove([key,self.S[key]])
+					states.remove([key, self.S[key]])
 					break
 
 		# make state transition table
@@ -236,12 +230,12 @@ class TableModule:
 	"""
 	Adds a given counterexample to the Table
 	"""
-	def addCounterexample(self,counterexample):
+	def addCounterexample(self, counterexample):
 		
 		strings = []
 		
 		# Generate all values (prefixes) which should be added 
-		for i in range(0,len(counterexample)+1):
+		for i in range(0, len(counterexample)+1):
 			strings.append(counterexample)
 			counterexample = counterexample[:-1]
 
@@ -264,11 +258,12 @@ class TableModule:
 	"""
 	Prints a visual representation of the Table (S,E,T)
 	"""
-	def printTable(self,description):
+	def printTable(self, description):
 		
 		if self._DEBUG_:
 
-			print "\n\n################################################\n" + description + "\n################################################"
+			print "\n\n################################################\n" + description + "\n" \
+			      "################################################ "
 
 			# Construct Headline with set E
 			headline = "\n T\t|  \t"
@@ -307,5 +302,3 @@ class TableModule:
 			print Blines
 
 			return 1
-
-
