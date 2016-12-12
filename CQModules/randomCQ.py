@@ -1,4 +1,5 @@
 import random
+import time
 
 class CQModule:
 
@@ -8,12 +9,16 @@ class CQModule:
 	def __init__(self, MQModule, TableModule, debugFlag, tries):
 		
 		self._DEBUG_ = debugFlag
+		self._TIME_ = 0
 
 		self.MQModule = MQModule
 		self.TableModule = TableModule
 
 		self.tries = tries
 
+
+	def getTime(self):
+		return self._TIME_
 	"""
 	Prints a visual representation of a given DFSM
 	"""
@@ -70,6 +75,8 @@ class CQModule:
 	"""
 	def isCorrect(self, DFSM):
 
+		start_time = time.time()
+
 		initState = DFSM[0]
 		finiteStates = DFSM[1]
 		ttable = DFSM[2]
@@ -104,7 +111,9 @@ class CQModule:
 			if answer != self.membershipQuery(''.join(example)):
 				if self._DEBUG_:
 					self.printDFSM(DFSM, "Following is not the correct DFSM")
+				self._TIME_ += time.time()-start_time
 				return ''.join(example)
-		
+
+		self._TIME_ += time.time()-start_time
 		self.printDFSM(DFSM, "Following is the correct DFSM")
 		return ''

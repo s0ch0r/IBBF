@@ -1,4 +1,5 @@
 from collections import defaultdict
+import time
 
 class TableModule:
 
@@ -9,6 +10,7 @@ class TableModule:
 		
 		self._DEBUG_ = debugFlag
 		self.MQModule = MQModule
+		self._TIME_ = 0
 
 		self.A = ['', ]
 		self.SA = {'': ''}
@@ -20,6 +22,8 @@ class TableModule:
 		self.printTable("Initial Table")
 
 
+	def getTime(self):
+		return self._TIME_
 
 	
 	""" 
@@ -40,6 +44,8 @@ class TableModule:
 	"""
 	def fixTable(self):
 
+		start_time = time.time()
+
 		while 42 == 42:
 			answer = self.testTableClosed()
 			if answer != "":
@@ -51,7 +57,9 @@ class TableModule:
 				self.fixTableInconsistent(answer)
 				self.printTable("Table after fixing inconsistency")
 				continue
+			self._TIME_ += time.time()-start_time
 			return 1
+		self._TIME_ += time.time()-start_time
 		return 0
 
 	"""
@@ -164,6 +172,8 @@ class TableModule:
 	"""
 	def getDFSM(self):
 
+		start_time = time.time()
+
 		row = 0
 		initState = 0
 		states = []
@@ -225,13 +235,16 @@ class TableModule:
 		# make DFSM
 		DFSM = [initState, finiteStates, ttable_new, self.A]
 
+		self._TIME_ += time.time()-start_time
 		return DFSM
 
 	"""
 	Adds a given counterexample to the Table
 	"""
 	def addCounterexample(self, counterexample):
-		
+
+		start_time = time.time()
+
 		strings = []
 		
 		# Generate all values (prefixes) which should be added 
@@ -252,7 +265,8 @@ class TableModule:
 				del self.SA[key]
 
 		self.printTable("Table after adding counterexample \"" + counterexample + "\"")
-		
+
+		self._TIME_ += time.time()-start_time
 		return 1
 
 	"""

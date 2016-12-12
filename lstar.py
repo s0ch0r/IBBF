@@ -5,7 +5,7 @@ import time
 """
 Implements the l* algorithm, returns a DFSM
 """
-def main(CQModule, MQModule, TModule, A, regex, debugFlag, length):
+def main(CQModule, MQModule, TModule, A, regex, debugFlag, length, timerFlag):
 
 	# Init Modules
 	sys.path.append('MQModules')
@@ -17,7 +17,7 @@ def main(CQModule, MQModule, TModule, A, regex, debugFlag, length):
 
 	# Algorithm
 	while 42 == 42:
-		
+
 		tableModule.fixTable()
 		DFSM = tableModule.getDFSM()
 		counterexample = CQModule.isCorrect(DFSM)
@@ -28,7 +28,13 @@ def main(CQModule, MQModule, TModule, A, regex, debugFlag, length):
 		break
 		
 	print "\n\n##################################\n# L* terminated succesfully!! :) #\n##################################"
-	return 1 
+
+	if timerFlag:
+		print "Execution time of modules:"
+		print "Conjecture-Query-Module: " + str(CQModule.getTime())
+		print "Table-Module:            " + str(tableModule.getTime())
+
+	return 1
 
 
 def printHelp():
@@ -47,6 +53,7 @@ def parseParameters():
 
 	_TEST_ = 0
 	_DEBUG_ = 0
+	_extendedTimer_ = 0
 	length = 5  	# Only for basicCQ module
 	A = ""
 	regex = ""
@@ -82,6 +89,8 @@ def parseParameters():
 
 		if sys.argv[i] == '-TM':
 			TModuleName = sys.argv[i+1]
+		if sys.argv[i] == '-eT':
+			_extendedTimer_ = 1
 
 	# Test parameter
 	if A == "" or regex == "":
@@ -92,7 +101,7 @@ def parseParameters():
 	else:	
 		# Start with timer
 		start_time = time.time()
-		main(CQModuleName, MQModuleName, TModuleName, A, regex, _DEBUG_, length)
+		main(CQModuleName, MQModuleName, TModuleName, A, regex, _DEBUG_, length, _extendedTimer_)
 		print("\nExecution time: %s seconds " % (time.time() - start_time))
 
 
