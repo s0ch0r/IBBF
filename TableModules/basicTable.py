@@ -6,7 +6,7 @@ class TableModule:
 	"""
 	Init lstar instance
 	"""
-	def __init__(self, MQModule, A, debugFlag):
+	def __init__(self, MQModule, A, debugFlag, params):
 		
 		self._DEBUG_ = debugFlag
 		self.MQModule = MQModule

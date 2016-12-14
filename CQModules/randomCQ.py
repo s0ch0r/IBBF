@@ -6,7 +6,7 @@ class CQModule:
 	"""
 	Init lstar instance
 	"""
-	def __init__(self, MQModule, TableModule, debugFlag, tries):
+	def __init__(self, MQModule, TableModule, debugFlag, params):
 		
 		self._DEBUG_ = debugFlag
 		self._TIME_ = 0
@@ -14,8 +14,10 @@ class CQModule:
 		self.MQModule = MQModule
 		self.TableModule = TableModule
 
-		self.tries = tries
+		parameter = params.split(",")
 
+		self.tries = int(parameter[0])
+		self.length = int(parameter[1])
 
 	def getTime(self):
 		return self._TIME_
@@ -95,7 +97,7 @@ class CQModule:
 
 			# Generate random example
 			example = []
-			for j in range(0, random.randint(0, 50)):
+			for j in range(0, random.randint(0, self.length)):
 				example.append(A[random.randint(0, len(A)-1)])
 				
 			# Calculate membership according to own DFSM

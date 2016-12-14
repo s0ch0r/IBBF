@@ -5,15 +5,15 @@ import time
 """
 Implements the l* algorithm, returns a DFSM
 """
-def main(CQModule, MQModule, TModule, A, regex, debugFlag, length, timerFlag):
+def main(CQModule, MQModule, TModule, A, debugFlag, timerFlag, cqpara, mqpara, tpara):
 
 	# Init Modules
 	sys.path.append('MQModules')
-	MQModule = (importlib.import_module(MQModule)).MQModule(regex, debugFlag)
+	MQModule = (importlib.import_module(MQModule)).MQModule(debugFlag, mqpara)
 	sys.path.append('TableModules')
-	tableModule = (importlib.import_module(TModule)).TableModule(MQModule, A, debugFlag)
+	tableModule = (importlib.import_module(TModule)).TableModule(MQModule, A, debugFlag, tpara)
 	sys.path.append('CQModules')
-	CQModule = (importlib.import_module(CQModule)).CQModule(MQModule, tableModule, debugFlag, length)
+	CQModule = (importlib.import_module(CQModule)).CQModule(MQModule, tableModule, debugFlag, cqpara)
 
 	# Algorithm
 	while 42 == 42:
@@ -41,12 +41,14 @@ def printHelp():
 	print "Parameters:"
 	print "-d\t\tDebug Mode"
 	print "-t\t\tTest Mode"
-	print "-r\t\tRegex"
 	print "-A\t\tAlphabet (eg \"abcdef\")"
-	print "-l\t\tMaxLength of Strings (only for basicCQ-Module)"
 	print "-CQ\t\tConjecture Query - Module to be used"
 	print "-MQ\t\tMembership Query - Module to be used"
 	print "-TM\t\tTable - Module to be used"
+	print "-cqp\t\tParameters for CQModule"
+	print "-mqp\t\tParameters for MQModule"
+	print "-tmp\t\tParameters for Table Module"
+	print "-eT\t\tExtended Timer for Modules"
 	sys.exit()
 
 def parseParameters():
@@ -54,12 +56,13 @@ def parseParameters():
 	_TEST_ = 0
 	_DEBUG_ = 0
 	_extendedTimer_ = 0
-	length = 5  	# Only for basicCQ module
 	A = ""
-	regex = ""
 	CQModuleName = "basicCQ"
 	MQModuleName = "regexMQ"
 	TModuleName = "basicTable"
+	cqpara = 0
+	mqpara = 0
+	tpara = 0
 
 	# Parse arguments
 	for i in range(1, len(sys.argv)):
@@ -71,15 +74,9 @@ def parseParameters():
 
 		if sys.argv[i] == '-t':
 			_TEST_ = 1
-
-		if sys.argv[i] == '-r':
-			regex = sys.argv[i+1]
 			
 		if sys.argv[i] == '-A':
 			A = list(sys.argv[i+1])
-
-		if sys.argv[i] == '-l':
-			length = int(sys.argv[i+1])
 		
 		if sys.argv[i] == '-CQ':
 			CQModuleName = sys.argv[i+1]
@@ -89,11 +86,21 @@ def parseParameters():
 
 		if sys.argv[i] == '-TM':
 			TModuleName = sys.argv[i+1]
+
 		if sys.argv[i] == '-eT':
 			_extendedTimer_ = 1
 
+		if sys.argv[i] == '-cqp':
+			cqpara = sys.argv[i+1]
+
+		if sys.argv[i] == '-mqp':
+			mqpara = sys.argv[i+1]
+
+		if sys.argv[i] == '-tp':
+			tpara = sys.argv[i+1]
+
 	# Test parameter
-	if A == "" or regex == "":
+	if A == "":
 		printHelp()
 	
 	if _TEST_ == 1:
@@ -101,7 +108,7 @@ def parseParameters():
 	else:	
 		# Start with timer
 		start_time = time.time()
-		main(CQModuleName, MQModuleName, TModuleName, A, regex, _DEBUG_, length, _extendedTimer_)
+		main(CQModuleName, MQModuleName, TModuleName, A, _DEBUG_, _extendedTimer_, cqpara, mqpara, tpara)
 		print("\nExecution time: %s seconds " % (time.time() - start_time))
 
 
