@@ -13,7 +13,7 @@ def main(CQModule, MQModule, TModule, A, debugFlag, timerFlag, cqpara, mqpara, t
 	sys.path.append('TableModules')
 	tableModule = (importlib.import_module(TModule)).TableModule(MQModule, A, debugFlag, tpara)
 	sys.path.append('CQModules')
-	CQModule = (importlib.import_module(CQModule)).CQModule(MQModule, tableModule, debugFlag, cqpara)
+	CQModule = (importlib.import_module(CQModule)).CQModule(MQModule, debugFlag, cqpara)
 
 	# Algorithm
 	while 42 == 42:

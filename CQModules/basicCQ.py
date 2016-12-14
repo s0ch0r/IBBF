@@ -5,12 +5,11 @@ class CQModule:
 	"""
 	Init lstar instance
 	"""
-	def __init__(self, MQModule, TableModule, debugFlag, length):
+	def __init__(self, MQModule, debugFlag, length):
 		
 		self._DEBUG_ = debugFlag
 
 		self.MQModule = MQModule
-		self.TableModule = TableModule
 
 		self.maxWordLength = length
 

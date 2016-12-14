@@ -6,13 +6,12 @@ class CQModule:
 	"""
 	Init lstar instance
 	"""
-	def __init__(self, MQModule, TableModule, debugFlag, params):
+	def __init__(self, MQModule, debugFlag, params):
 		
 		self._DEBUG_ = debugFlag
 		self._TIME_ = 0
 
 		self.MQModule = MQModule
-		self.TableModule = TableModule
 
 		parameter = params.split(",")
 
