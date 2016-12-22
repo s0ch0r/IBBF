@@ -1,11 +1,16 @@
-import sys
 import importlib
+import sys
 import time
+from APModules import alphabet_parser
 
 """
 Implements the l* algorithm, returns a DFSM
 """
-def main(CQModule, MQModule, TModule, A, debugFlag, timerFlag, cqpara, mqpara, tpara):
+def main(CQModule, MQModule, TModule, alphabet_location, debugFlag, timerFlag, cqpara, mqpara, tpara):
+
+	# parse Alphabet
+	parser = alphabet_parser.AlphabetParser(alphabet_location)
+	A = parser.getAlphabet()
 
 	# Init Modules
 	sys.path.append('MQModules')
@@ -13,7 +18,7 @@ def main(CQModule, MQModule, TModule, A, debugFlag, timerFlag, cqpara, mqpara, t
 	sys.path.append('TableModules')
 	tableModule = (importlib.import_module(TModule)).TableModule(MQModule, A, debugFlag, tpara)
 	sys.path.append('CQModules')
-	CQModule = (importlib.import_module(CQModule)).CQModule(MQModule, debugFlag, cqpara)
+	CQModule = (importlib.import_module(CQModule)).CQModule(MQModule, parser, debugFlag, cqpara)
 
 	# Algorithm
 	while 42 == 42:
@@ -56,7 +61,7 @@ def parseParameters():
 	_TEST_ = 0
 	_DEBUG_ = 0
 	_extendedTimer_ = 0
-	A = ""
+	alphabet_location = ""
 	CQModuleName = "basicCQ"
 	MQModuleName = "regexMQ"
 	TModuleName = "basicTable"
@@ -76,7 +81,7 @@ def parseParameters():
 			_TEST_ = 1
 			
 		if sys.argv[i] == '-A':
-			A = list(sys.argv[i+1])
+			alphabet_location = sys.argv[i+1]
 		
 		if sys.argv[i] == '-CQ':
 			CQModuleName = sys.argv[i+1]
@@ -100,7 +105,7 @@ def parseParameters():
 			tpara = sys.argv[i+1]
 
 	# Test parameter
-	if A == "":
+	if alphabet_location == "":
 		printHelp()
 	
 	if _TEST_ == 1:
@@ -108,7 +113,7 @@ def parseParameters():
 	else:	
 		# Start with timer
 		start_time = time.time()
-		main(CQModuleName, MQModuleName, TModuleName, A, _DEBUG_, _extendedTimer_, cqpara, mqpara, tpara)
+		main(CQModuleName, MQModuleName, TModuleName, alphabet_location, _DEBUG_, _extendedTimer_, cqpara, mqpara, tpara)
 		print("\nExecution time: %s seconds " % (time.time() - start_time))
 
 

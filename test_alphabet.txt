@@ -1,0 +1,4 @@
+Set()
+Get()
+Remove()
+print()

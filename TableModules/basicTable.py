@@ -1,5 +1,7 @@
 from collections import defaultdict
 import time
+from IBBFObjects import simple_object
+import sys
 
 class TableModule:
 
@@ -13,9 +15,9 @@ class TableModule:
 		self._TIME_ = 0
 
 		self.A = ['', ]
-		self.SA = {'': ''}
-		self.S = {'': self.membershipQuery('')}
-		self.E = ['', ]
+		self.SA = {simple_object.IBBFObj(''): ''}
+		self.S = {simple_object.IBBFObj(''): self.membershipQuery(simple_object.IBBFObj(''))}
+		self.E = [simple_object.IBBFObj(''), ]
 		
 		self.setAlphabet(A)
 
@@ -34,7 +36,7 @@ class TableModule:
 		self.SA.clear()
 		self.A = newA
 		for a in self.A:
-			self.SA[a] = self.membershipQuery(a)
+			self.SA[simple_object.IBBFObj('') + a] = self.membershipQuery(simple_object.IBBFObj('') + a)
 
 		return 1
 
@@ -180,7 +182,6 @@ class TableModule:
 		ttable = defaultdict(list)
 		ttable_new = defaultdict(list)
 		finiteStates = []
-		mapping = {'': 'q0'}
 
 		# parse different states
 		for key in self.S:
@@ -208,17 +209,18 @@ class TableModule:
 
 		# parse finite and initial state(s)
 		for i in range(0, len(states)):
+
 			if states[i][1][0] == '1':
 				finiteStates.append(states[i][0])
 			if states[i][0] == '':
 				initState = states[i][0]
-		
 
 		# parse to readable form by exchanging state names with values of the form q_i:
 		i = 0
+		mapping = {simple_object.IBBFObj(''): 'q0'}
 
 		for key in ttable:
-			mapping[key] = 'q'+str(i)
+			mapping[key] = 'q' + str(i)
 			i += 1
 
 		initState = mapping[initState]
@@ -228,7 +230,7 @@ class TableModule:
 		for key in ttable:
 			for i in range(0, len(self.A)):
 				ttable[key][i] = mapping[ttable[key][i]]
-		
+
 		for key in ttable:
 			ttable_new[mapping[key]] = ttable[key]
 
@@ -245,26 +247,20 @@ class TableModule:
 
 		start_time = time.time()
 
-		strings = []
-		
-		# Generate all values (prefixes) which should be added 
-		for i in range(0, len(counterexample)+1):
-			strings.append(counterexample)
-			counterexample = counterexample[:-1]
+		objects = []
 
-		# Add values to S (and their corresponding ones to SA) if they are not already there
-		for i in range(0, len(strings)):
-			if strings[i] not in self.S:
-				self.S[strings[i]] = self.queryRow(strings[i])
-				for a in self.A:
-					self.SA[strings[i]+a] = self.queryRow(strings[i]+a)
+		for i in range(len(counterexample.identifier)-1, 0, -1):
+			self.S[counterexample] = self.queryRow(counterexample)
+			for a in self.A:
+				self.SA[counterexample + a] = self.queryRow(counterexample + a)
+			counterexample = counterexample.removeElement()
 		
 		# Remove duplicate values
 		for key in self.S:
 			if key in self.SA:
 				del self.SA[key]
 
-		self.printTable("Table after adding counterexample \"" + counterexample + "\"")
+		self.printTable("Table after adding counterexample \"" + str(counterexample.identifier) + "\"")
 
 		self._TIME_ += time.time()-start_time
 		return 1
@@ -282,7 +278,7 @@ class TableModule:
 			# Construct Headline with set E
 			headline = "\n T\t|  \t"
 			for i in range(1, len(self.E)):
-				headline += "| " + self.E[i] + "\t"
+				headline += "| " + str(self.E[i].identifier) + "\t"
 			print headline
 
 			# Construct line
@@ -295,7 +291,7 @@ class TableModule:
 			keys = self.S.keys()
 			Alines = ""
 			for i in range(0, len(keys)):
-				Alines += keys[i] + "\t"
+				Alines += str(keys[i].identifier) + "\t"
 				row = list(self.S[keys[i]])
 				for j in range(0, len(row)):
 					Alines += "| " + row[j] + "\t"
@@ -308,7 +304,7 @@ class TableModule:
 			keys = self.SA.keys()
 			Blines = ""
 			for i in range(0, len(keys)):
-				Blines += keys[i] + "\t"
+				Blines += str(keys[i].identifier) + "\t"
 				row = list(self.SA[keys[i]])
 				for j in range(0, len(row)):
 					Blines += "| " + row[j] + "\t"
