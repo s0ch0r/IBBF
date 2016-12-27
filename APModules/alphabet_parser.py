@@ -1,9 +1,8 @@
-from IBBFObjects import basicObject
-
 class AlphabetParser:
 
-    def __init__(self, location):
+    def __init__(self, location, ObjectClass):
         self.location = location
+        self.ObjectClass = ObjectClass
 
     def getAlphabet(self):
 
@@ -18,7 +17,7 @@ class AlphabetParser:
                 line = line[:-1]
 
             if line != "":
-                A.append(basicObject.IBBFObj(line))
+                A.append(self.ObjectClass.IBBFObj(line))
             else:
                 break
 

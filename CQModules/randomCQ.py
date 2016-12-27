@@ -1,6 +1,5 @@
 import random
 import time
-from IBBFObjects import basicObject
 from IBBFPrintModules import lstar_printer
 
 class CQModule:
@@ -8,13 +7,14 @@ class CQModule:
 	"""
 	Init lstar instance
 	"""
-	def __init__(self, MQModule, parser, debugFlag, params):
+	def __init__(self, ObjectClass, MQModule, parser, debugFlag, params):
 		
 		self._DEBUG_ = debugFlag
 		self._TIME_ = 0
 
 		self.MQModule = MQModule
 		self.Parser = parser
+		self.ObjectClass = ObjectClass
 
 		parameter = params.split(",")
 
@@ -71,18 +71,18 @@ class CQModule:
 				answer = '0'
 
 			# Generate Query object
-			query = basicObject.IBBFObj('')
+			query = self.ObjectClass.IBBFObj('')
 			for a in example:
-				query += basicObject.IBBFObj(a)
+				query += self.ObjectClass.IBBFObj(a)
 
 
 			# Compare
 			if answer != self.membershipQuery(query):
 				if self._DEBUG_:
-					lstar_printer.LstarPrinter.printDFSM(DFSM, "Following is not the correct DFSM")
+					lstar_printer.LstarPrinter.printDFSM(DFSM, "Following is not the correct DFSM", self.ObjectClass)
 				self._TIME_ += time.time()-start_time
-				return query
+				return example
 
 		self._TIME_ += time.time()-start_time
-		lstar_printer.LstarPrinter.printDFSM(DFSM, "Following is the correct DFSM")
+		lstar_printer.LstarPrinter.printDFSM(DFSM, "Following is the correct DFSM", self.ObjectClass)
 		return ''

@@ -1,22 +1,22 @@
 from collections import defaultdict
 import time
-from IBBFObjects import basicObject
 
 class TableModule:
 
 	"""
 	Init lstar instance
 	"""
-	def __init__(self, MQModule, A, debugFlag, params):
+	def __init__(self, ObjectClass, MQModule, A, debugFlag, params):
 		
 		self._DEBUG_ = debugFlag
 		self.MQModule = MQModule
+		self.ObjectClass = ObjectClass
 		self._TIME_ = 0
 
 		self.A = ['', ]
-		self.SA = {basicObject.IBBFObj(''): ''}
-		self.S = {basicObject.IBBFObj(''): self.membershipQuery(basicObject.IBBFObj(''))}
-		self.E = [basicObject.IBBFObj(''), ]
+		self.SA = {self.ObjectClass.IBBFObj(''): ''}
+		self.S = {self.ObjectClass.IBBFObj(''): self.membershipQuery(self.ObjectClass.IBBFObj(''))}
+		self.E = [self.ObjectClass.IBBFObj(''), ]
 		
 		self.setAlphabet(A)
 
@@ -35,7 +35,7 @@ class TableModule:
 		self.SA.clear()
 		self.A = newA
 		for a in self.A:
-			self.SA[basicObject.IBBFObj('') + a] = self.membershipQuery(basicObject.IBBFObj('') + a)
+			self.SA[self.ObjectClass.IBBFObj('') + a] = self.membershipQuery(self.ObjectClass.IBBFObj('') + a)
 
 		return 1
 
@@ -227,18 +227,25 @@ class TableModule:
 
 		start_time = time.time()
 
-		for i in range(len(counterexample.identifier)-1, 0, -1):
-			self.S[counterexample] = self.queryRow(counterexample)
+		# Generate list of objects to add
+		example = self.ObjectClass.IBBFObj(counterexample[0])
+		example_list = [example]
+		for i in range(1, len(counterexample)):
+			example += self.ObjectClass.IBBFObj(counterexample[i])
+			example_list.append(example)
+
+		# add objects
+		for e in example_list:
+			self.S[e] = self.queryRow(e)
 			for a in self.A:
-				self.SA[counterexample + a] = self.queryRow(counterexample + a)
-			counterexample = counterexample.removeElement()
-		
+				self.SA[e + a] = self.queryRow(e + a)
+
 		# Remove duplicate values
 		for key in self.S:
 			if key in self.SA:
 				del self.SA[key]
 
-		self.printTable("Table after adding counterexample \"" + str(counterexample.identifier) + "\"")
+		self.printTable("Table after adding counterexample \"" + str(counterexample) + "\"")
 
 		self._TIME_ += time.time()-start_time
 		return 1

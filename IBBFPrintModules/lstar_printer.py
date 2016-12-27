@@ -1,4 +1,3 @@
-from IBBFObjects import basicObject
 from collections import defaultdict
 
 class LstarPrinter:
@@ -8,7 +7,7 @@ class LstarPrinter:
         print ""
 
     @staticmethod
-    def printDFSM(DFSM, description):
+    def printDFSM(DFSM, description, ObjectClass):
 
         print "\n\n################################################\n" + description + "\n" \
                   "################################################ "
@@ -21,7 +20,7 @@ class LstarPrinter:
 
         # parse to readable form by exchanging state names with values of the form q_i:
         i = 0
-        mapping = {basicObject.IBBFObj(''): 'q0'}
+        mapping = {ObjectClass.IBBFObj(''): 'q0'}
 
         for key in ttable:
             mapping[key] = 'q' + str(i)

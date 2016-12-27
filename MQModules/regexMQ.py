@@ -17,6 +17,8 @@ class MQModule:
 	"""
 	def isMember(self, test_object):
 
+		#print test_object.identifier
+
 		if not isinstance(test_object, basestring):
 			teststring = ''.join(test_object.identifier)
 		else:
