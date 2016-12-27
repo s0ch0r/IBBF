@@ -1,19 +1,28 @@
-import sys
 import importlib
+import sys
 import time
+from APModules import alphabet_parser
 
 """
 Implements the l* algorithm, returns a DFSM
 """
-def main(CQModule, MQModule, TModule, A, debugFlag, timerFlag, cqpara, mqpara, tpara):
+def main(object_classname, CQModule, MQModule, TModule, alphabet_location, debugFlag, timerFlag, cqpara, mqpara, tpara):
+
+	# Init ObjectClass
+	sys.path.append('IBBFObjects')
+	ObjectClass = (importlib.import_module(object_classname))
+
+	# parse Alphabet
+	parser = alphabet_parser.AlphabetParser(alphabet_location, ObjectClass)
+	A = parser.getAlphabet()
 
 	# Init Modules
 	sys.path.append('MQModules')
 	MQModule = (importlib.import_module(MQModule)).MQModule(debugFlag, mqpara)
 	sys.path.append('TableModules')
-	tableModule = (importlib.import_module(TModule)).TableModule(MQModule, A, debugFlag, tpara)
+	tableModule = (importlib.import_module(TModule)).TableModule(ObjectClass, MQModule, A, debugFlag, tpara)
 	sys.path.append('CQModules')
-	CQModule = (importlib.import_module(CQModule)).CQModule(MQModule, debugFlag, cqpara)
+	CQModule = (importlib.import_module(CQModule)).CQModule(ObjectClass, MQModule, parser, debugFlag, cqpara)
 
 	# Algorithm
 	while 42 == 42:
@@ -56,10 +65,11 @@ def parseParameters():
 	_TEST_ = 0
 	_DEBUG_ = 0
 	_extendedTimer_ = 0
-	A = ""
-	CQModuleName = "basicCQ"
+	alphabet_location = ""
+	CQModuleName = "randomCQ"
 	MQModuleName = "regexMQ"
 	TModuleName = "basicTable"
+	object_classname = "basicObject"
 	cqpara = 0
 	mqpara = 0
 	tpara = 0
@@ -76,7 +86,7 @@ def parseParameters():
 			_TEST_ = 1
 			
 		if sys.argv[i] == '-A':
-			A = list(sys.argv[i+1])
+			alphabet_location = sys.argv[i+1]
 		
 		if sys.argv[i] == '-CQ':
 			CQModuleName = sys.argv[i+1]
@@ -99,8 +109,11 @@ def parseParameters():
 		if sys.argv[i] == '-tp':
 			tpara = sys.argv[i+1]
 
+		if sys.argv[i] == '-O':
+			object_classname = sys.argv[i+1]
+
 	# Test parameter
-	if A == "":
+	if alphabet_location == "":
 		printHelp()
 	
 	if _TEST_ == 1:
@@ -108,7 +121,7 @@ def parseParameters():
 	else:	
 		# Start with timer
 		start_time = time.time()
-		main(CQModuleName, MQModuleName, TModuleName, A, _DEBUG_, _extendedTimer_, cqpara, mqpara, tpara)
+		main(object_classname, CQModuleName, MQModuleName, TModuleName, alphabet_location, _DEBUG_, _extendedTimer_, cqpara, mqpara, tpara)
 		print("\nExecution time: %s seconds " % (time.time() - start_time))
 
 

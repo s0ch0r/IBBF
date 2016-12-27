@@ -6,16 +6,17 @@ class TableModule:
 	"""
 	Init lstar instance
 	"""
-	def __init__(self, MQModule, A, debugFlag, params):
+	def __init__(self, ObjectClass, MQModule, A, debugFlag, params):
 		
 		self._DEBUG_ = debugFlag
 		self.MQModule = MQModule
+		self.ObjectClass = ObjectClass
 		self._TIME_ = 0
 
 		self.A = ['', ]
-		self.SA = {'': ''}
-		self.S = {'': self.membershipQuery('')}
-		self.E = ['', ]
+		self.SA = {self.ObjectClass.IBBFObj(''): ''}
+		self.S = {self.ObjectClass.IBBFObj(''): self.membershipQuery(self.ObjectClass.IBBFObj(''))}
+		self.E = [self.ObjectClass.IBBFObj(''), ]
 		
 		self.setAlphabet(A)
 
@@ -34,7 +35,7 @@ class TableModule:
 		self.SA.clear()
 		self.A = newA
 		for a in self.A:
-			self.SA[a] = self.membershipQuery(a)
+			self.SA[self.ObjectClass.IBBFObj('') + a] = self.membershipQuery(self.ObjectClass.IBBFObj('') + a)
 
 		return 1
 
@@ -97,15 +98,16 @@ class TableModule:
 	"""
 	def fixTableInconsistent(self, s):
 
-		# Search for suitable canditates of a and e to fix the inconsistency of the given values s_1, s_2
+		# Search for suitable candidates of a and e to fix the inconsistency of the given values s_1, s_2
 		for a in self.A:
 			for e in self.E:
 				if self.membershipQuery(s[0]+a+e) is not self.membershipQuery(s[1]+a+e):
 					
 					# add suitable value (ae) to E
+					# noinspection PyTypeChecker
 					self.E.append(a+e)
 
-					# Fill new collumn with membership queries
+					# Fill new column with membership queries
 					for key in self.S:
 						self.S[key] += self.membershipQuery(key+a+e)
 					for key in self.SA:
@@ -178,9 +180,7 @@ class TableModule:
 		initState = 0
 		states = []
 		ttable = defaultdict(list)
-		ttable_new = defaultdict(list)
 		finiteStates = []
-		mapping = {'': 'q0'}
 
 		# parse different states
 		for key in self.S:
@@ -208,32 +208,14 @@ class TableModule:
 
 		# parse finite and initial state(s)
 		for i in range(0, len(states)):
+
 			if states[i][1][0] == '1':
 				finiteStates.append(states[i][0])
 			if states[i][0] == '':
 				initState = states[i][0]
-		
-
-		# parse to readable form by exchanging state names with values of the form q_i:
-		i = 0
-
-		for key in ttable:
-			mapping[key] = 'q'+str(i)
-			i += 1
-
-		initState = mapping[initState]
-		for i in range(0, len(finiteStates)):
-			finiteStates[i] = mapping[finiteStates[i]]
-
-		for key in ttable:
-			for i in range(0, len(self.A)):
-				ttable[key][i] = mapping[ttable[key][i]]
-		
-		for key in ttable:
-			ttable_new[mapping[key]] = ttable[key]
 
 		# make DFSM
-		DFSM = [initState, finiteStates, ttable_new, self.A]
+		DFSM = [initState, finiteStates, ttable, self.A]
 
 		self._TIME_ += time.time()-start_time
 		return DFSM
@@ -245,26 +227,25 @@ class TableModule:
 
 		start_time = time.time()
 
-		strings = []
-		
-		# Generate all values (prefixes) which should be added 
-		for i in range(0, len(counterexample)+1):
-			strings.append(counterexample)
-			counterexample = counterexample[:-1]
+		# Generate list of objects to add
+		example = self.ObjectClass.IBBFObj(counterexample[0])
+		example_list = [example]
+		for i in range(1, len(counterexample)):
+			example += self.ObjectClass.IBBFObj(counterexample[i])
+			example_list.append(example)
 
-		# Add values to S (and their corresponding ones to SA) if they are not already there
-		for i in range(0, len(strings)):
-			if strings[i] not in self.S:
-				self.S[strings[i]] = self.queryRow(strings[i])
-				for a in self.A:
-					self.SA[strings[i]+a] = self.queryRow(strings[i]+a)
-		
+		# add objects
+		for e in example_list:
+			self.S[e] = self.queryRow(e)
+			for a in self.A:
+				self.SA[e + a] = self.queryRow(e + a)
+
 		# Remove duplicate values
 		for key in self.S:
 			if key in self.SA:
 				del self.SA[key]
 
-		self.printTable("Table after adding counterexample \"" + counterexample + "\"")
+		self.printTable("Table after adding counterexample \"" + str(counterexample) + "\"")
 
 		self._TIME_ += time.time()-start_time
 		return 1
@@ -282,7 +263,7 @@ class TableModule:
 			# Construct Headline with set E
 			headline = "\n T\t|  \t"
 			for i in range(1, len(self.E)):
-				headline += "| " + self.E[i] + "\t"
+				headline += "| " + str(self.E[i].identifier) + "\t"
 			print headline
 
 			# Construct line
@@ -295,7 +276,7 @@ class TableModule:
 			keys = self.S.keys()
 			Alines = ""
 			for i in range(0, len(keys)):
-				Alines += keys[i] + "\t"
+				Alines += str(keys[i].identifier) + "\t"
 				row = list(self.S[keys[i]])
 				for j in range(0, len(row)):
 					Alines += "| " + row[j] + "\t"
@@ -308,7 +289,7 @@ class TableModule:
 			keys = self.SA.keys()
 			Blines = ""
 			for i in range(0, len(keys)):
-				Blines += keys[i] + "\t"
+				Blines += str(keys[i].identifier) + "\t"
 				row = list(self.SA[keys[i]])
 				for j in range(0, len(row)):
 					Blines += "| " + row[j] + "\t"
