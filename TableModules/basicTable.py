@@ -1,7 +1,6 @@
 from collections import defaultdict
 import time
-from IBBFObjects import simple_object
-import sys
+from IBBFObjects import basicObject
 
 class TableModule:
 
@@ -15,9 +14,9 @@ class TableModule:
 		self._TIME_ = 0
 
 		self.A = ['', ]
-		self.SA = {simple_object.IBBFObj(''): ''}
-		self.S = {simple_object.IBBFObj(''): self.membershipQuery(simple_object.IBBFObj(''))}
-		self.E = [simple_object.IBBFObj(''), ]
+		self.SA = {basicObject.IBBFObj(''): ''}
+		self.S = {basicObject.IBBFObj(''): self.membershipQuery(basicObject.IBBFObj(''))}
+		self.E = [basicObject.IBBFObj(''), ]
 		
 		self.setAlphabet(A)
 
@@ -36,7 +35,7 @@ class TableModule:
 		self.SA.clear()
 		self.A = newA
 		for a in self.A:
-			self.SA[simple_object.IBBFObj('') + a] = self.membershipQuery(simple_object.IBBFObj('') + a)
+			self.SA[basicObject.IBBFObj('') + a] = self.membershipQuery(basicObject.IBBFObj('') + a)
 
 		return 1
 
@@ -99,15 +98,16 @@ class TableModule:
 	"""
 	def fixTableInconsistent(self, s):
 
-		# Search for suitable canditates of a and e to fix the inconsistency of the given values s_1, s_2
+		# Search for suitable candidates of a and e to fix the inconsistency of the given values s_1, s_2
 		for a in self.A:
 			for e in self.E:
 				if self.membershipQuery(s[0]+a+e) is not self.membershipQuery(s[1]+a+e):
 					
 					# add suitable value (ae) to E
+					# noinspection PyTypeChecker
 					self.E.append(a+e)
 
-					# Fill new collumn with membership queries
+					# Fill new column with membership queries
 					for key in self.S:
 						self.S[key] += self.membershipQuery(key+a+e)
 					for key in self.SA:
@@ -180,7 +180,6 @@ class TableModule:
 		initState = 0
 		states = []
 		ttable = defaultdict(list)
-		ttable_new = defaultdict(list)
 		finiteStates = []
 
 		# parse different states
@@ -215,27 +214,8 @@ class TableModule:
 			if states[i][0] == '':
 				initState = states[i][0]
 
-		# parse to readable form by exchanging state names with values of the form q_i:
-		i = 0
-		mapping = {simple_object.IBBFObj(''): 'q0'}
-
-		for key in ttable:
-			mapping[key] = 'q' + str(i)
-			i += 1
-
-		initState = mapping[initState]
-		for i in range(0, len(finiteStates)):
-			finiteStates[i] = mapping[finiteStates[i]]
-
-		for key in ttable:
-			for i in range(0, len(self.A)):
-				ttable[key][i] = mapping[ttable[key][i]]
-
-		for key in ttable:
-			ttable_new[mapping[key]] = ttable[key]
-
 		# make DFSM
-		DFSM = [initState, finiteStates, ttable_new, self.A]
+		DFSM = [initState, finiteStates, ttable, self.A]
 
 		self._TIME_ += time.time()-start_time
 		return DFSM
@@ -246,8 +226,6 @@ class TableModule:
 	def addCounterexample(self, counterexample):
 
 		start_time = time.time()
-
-		objects = []
 
 		for i in range(len(counterexample.identifier)-1, 0, -1):
 			self.S[counterexample] = self.queryRow(counterexample)

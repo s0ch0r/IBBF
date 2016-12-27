@@ -62,7 +62,7 @@ def parseParameters():
 	_DEBUG_ = 0
 	_extendedTimer_ = 0
 	alphabet_location = ""
-	CQModuleName = "basicCQ"
+	CQModuleName = "randomCQ"
 	MQModuleName = "regexMQ"
 	TModuleName = "basicTable"
 	cqpara = 0

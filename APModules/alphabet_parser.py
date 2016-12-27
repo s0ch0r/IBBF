@@ -1,4 +1,4 @@
-from IBBFObjects import simple_object
+from IBBFObjects import basicObject
 
 class AlphabetParser:
 
@@ -18,7 +18,7 @@ class AlphabetParser:
                 line = line[:-1]
 
             if line != "":
-                A.append(simple_object.IBBFObj(line))
+                A.append(basicObject.IBBFObj(line))
             else:
                 break
 

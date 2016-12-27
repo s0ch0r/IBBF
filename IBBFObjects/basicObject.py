@@ -1,5 +1,3 @@
-import sys
-
 class IBBFObj:
     def __init__(self, identifier):
         if isinstance(identifier, basestring):
@@ -7,7 +5,6 @@ class IBBFObj:
             self.identifier.append(identifier)
         else:
             self.identifier = identifier
-
 
     def __hash__(self):
         return hash(''.join(self.identifier))
