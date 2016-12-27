@@ -6,12 +6,13 @@ class TableModule:
 	"""
 	Init lstar instance
 	"""
-	def __init__(self, ObjectClass, MQModule, A, debugFlag, params):
+	def __init__(self, ObjectClass, MQModule, A, debugFlag, params, testFlag):
 		
 		self._DEBUG_ = debugFlag
 		self.MQModule = MQModule
 		self.ObjectClass = ObjectClass
 		self._TIME_ = 0
+		self._TEST_ = testFlag
 
 		self.A = ['', ]
 		self.SA = {self.ObjectClass.IBBFObj(''): ''}
@@ -25,6 +26,10 @@ class TableModule:
 
 	def getTime(self):
 		return self._TIME_
+
+	@staticmethod
+	def getTestParameter():
+		return ""
 
 	
 	""" 
@@ -255,7 +260,7 @@ class TableModule:
 	"""
 	def printTable(self, description):
 		
-		if self._DEBUG_:
+		if self._DEBUG_ and not self._TEST_:
 
 			print "\n\n################################################\n" + description + "\n" \
 			      "################################################ "

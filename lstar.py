@@ -1,12 +1,13 @@
 import importlib
 import sys
 import time
+import os
 from APModules import alphabet_parser
 
 """
 Implements the l* algorithm, returns a DFSM
 """
-def main(object_classname, CQModule, MQModule, TModule, alphabet_location, debugFlag, timerFlag, cqpara, mqpara, tpara):
+def main(object_classname, CQModule, MQModule, TModule, alphabet_location, debugFlag, timerFlag, testFlag, cqpara, mqpara, tpara):
 
 	# Init ObjectClass
 	sys.path.append('IBBFObjects')
@@ -20,9 +21,9 @@ def main(object_classname, CQModule, MQModule, TModule, alphabet_location, debug
 	sys.path.append('MQModules')
 	MQModule = (importlib.import_module(MQModule)).MQModule(debugFlag, mqpara)
 	sys.path.append('TableModules')
-	tableModule = (importlib.import_module(TModule)).TableModule(ObjectClass, MQModule, A, debugFlag, tpara)
+	tableModule = (importlib.import_module(TModule)).TableModule(ObjectClass, MQModule, A, debugFlag, tpara, testFlag)
 	sys.path.append('CQModules')
-	CQModule = (importlib.import_module(CQModule)).CQModule(ObjectClass, MQModule, parser, debugFlag, cqpara)
+	CQModule = (importlib.import_module(CQModule)).CQModule(ObjectClass, MQModule, parser, debugFlag, cqpara, testFlag)
 
 	# Algorithm
 	while 42 == 42:
@@ -36,14 +37,15 @@ def main(object_classname, CQModule, MQModule, TModule, alphabet_location, debug
 			continue
 		break
 		
-	print "\n\n##################################\n# L* terminated succesfully!! :) #\n##################################"
+	if not testFlag:
+		print "\n\n##################################\n# L* terminated succesfully!! :) #\n##################################"
 
-	if timerFlag:
+	if timerFlag and not testFlag:
 		print "Execution time of modules:"
 		print "Conjecture-Query-Module: " + str(CQModule.getTime())
 		print "Table-Module:            " + str(tableModule.getTime())
 
-	return 1
+	return DFSM
 
 
 def printHelp():
@@ -117,12 +119,70 @@ def parseParameters():
 		printHelp()
 	
 	if _TEST_ == 1:
-		print "Test Mode currently not available"
+		startTesting()
+		sys.exit()
 	else:	
 		# Start with timer
 		start_time = time.time()
-		main(object_classname, CQModuleName, MQModuleName, TModuleName, alphabet_location, _DEBUG_, _extendedTimer_, cqpara, mqpara, tpara)
+		main(object_classname, CQModuleName, MQModuleName, TModuleName, alphabet_location, _DEBUG_, _extendedTimer_, _TEST_, cqpara, mqpara, tpara)
 		print("\nExecution time: %s seconds " % (time.time() - start_time))
 
+
+def startTesting():
+
+	results = ""
+
+	# Get CQModules:
+	CQModule_list = []
+	for filename in os.listdir("C:\_Daten\Daten\IBBF\CQModules"):
+		if filename.endswith(".py") and filename != "__init__.py":
+			CQModule_list.append(filename.split('.')[0])
+
+	# Get MQModules:
+	MQModule_list = []
+	for filename in os.listdir("C:\_Daten\Daten\IBBF\MQModules"):
+		if filename.endswith(".py") and filename != "__init__.py":
+			MQModule_list.append(filename.split('.')[0])
+
+	# Get TableModules:
+	TableModule_list = []
+	for filename in os.listdir("C:\_Daten\Daten\IBBF\TableModules"):
+		if filename.endswith(".py") and filename != "__init__.py":
+			TableModule_list.append(filename.split('.')[0])
+
+	errors = 0
+	warnings = 0
+
+	# Try combinations
+	for CQModule in CQModule_list:
+		for MQModule in MQModule_list:
+			for TableModule in TableModule_list:
+
+				# Test combination
+				print "Testing " + str(CQModule) + "-" + str(MQModule) + "-" + str(TableModule) + " ..."
+				result = "Passed"
+				try:
+					# Get modules for test-parameters
+					parameter = {}
+					sys.path.append('CQModules')
+					parameter['CQ'] = (importlib.import_module(CQModule).CQModule.getTestParameter())
+					sys.path.append('MQModules')
+					parameter['MQ'] = (importlib.import_module(MQModule).MQModule.getTestParameter())
+					sys.path.append('TableModules')
+					parameter['T'] = (importlib.import_module(TableModule).TableModule.getTestParameter())
+
+					# Test-Run
+					DFSM = main("basicObject", CQModule, MQModule, TableModule, "IBBFTestFiles/alphabet.txt", 0, 0, 1, parameter['CQ'], parameter['MQ'], parameter['T'])
+
+					# See if result seems to be correct
+					if len(DFSM[1]) != 2 or len(DFSM[2]) != 9 or len(DFSM[3]) != 77:
+						warnings += 1
+						result = "WARNING :: No errors occurred, but it seems that the resulting DFSM is incorrect"
+				except Exception as e:
+					errors += 1
+					result = "ERROR :: " + str(e)
+				print result
+
+	print "\nFinished, " + str(warnings) + " warnings and " + str(errors) + " errors."
 
 parseParameters()

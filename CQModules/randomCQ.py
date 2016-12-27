@@ -7,10 +7,11 @@ class CQModule:
 	"""
 	Init lstar instance
 	"""
-	def __init__(self, ObjectClass, MQModule, parser, debugFlag, params):
+	def __init__(self, ObjectClass, MQModule, parser, debugFlag, params, testFlag):
 		
 		self._DEBUG_ = debugFlag
 		self._TIME_ = 0
+		self._TEST_ = testFlag
 
 		self.MQModule = MQModule
 		self.Parser = parser
@@ -24,6 +25,9 @@ class CQModule:
 	def getTime(self):
 		return self._TIME_
 
+	@staticmethod
+	def getTestParameter():
+		return "1000000,50"
 
 	"""
 	Makes a membership query to a teacher and returns 1 if string was a member and 0 if not
@@ -78,11 +82,12 @@ class CQModule:
 
 			# Compare
 			if answer != self.membershipQuery(query):
-				if self._DEBUG_:
+				if self._DEBUG_ and not self._TEST_:
 					lstar_printer.LstarPrinter.printDFSM(DFSM, "Following is not the correct DFSM", self.ObjectClass)
 				self._TIME_ += time.time()-start_time
 				return example
 
 		self._TIME_ += time.time()-start_time
-		lstar_printer.LstarPrinter.printDFSM(DFSM, "Following is the correct DFSM", self.ObjectClass)
+		if not self._TEST_:
+			lstar_printer.LstarPrinter.printDFSM(DFSM, "Following is the correct DFSM", self.ObjectClass)
 		return ''

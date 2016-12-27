@@ -8,9 +8,11 @@ class MQModule:
 	def __init__(self, debugFlag, regex):
 
 		self._DEBUG_ = debugFlag
-		print regex
 		self.regex = re.compile(regex)
 
+	@staticmethod
+	def getTestParameter():
+		return "^[a-z0-9]{1,}@[a-z0-9]{1,}\.[a-z]{2,3}$"
 
 	"""
 	Makes a membership query to a teacher and returns 1 if string was a member and 0 if not
