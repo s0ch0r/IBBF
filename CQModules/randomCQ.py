@@ -85,7 +85,7 @@ class CQModule:
 				if self._DEBUG_ and not self._TEST_:
 					lstar_printer.LstarPrinter.printDFSM(DFSM, "Following is not the correct DFSM", self.ObjectClass)
 				self._TIME_ += time.time()-start_time
-				return example
+				return [''] + example
 
 		self._TIME_ += time.time()-start_time
 		if not self._TEST_:

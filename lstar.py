@@ -8,7 +8,6 @@ from APModules import alphabet_parser
 Implements the l* algorithm, returns a DFSM
 """
 def main(object_classname, CQModule, MQModule, TModule, alphabet_location, debugFlag, timerFlag, testFlag, cqpara, mqpara, tpara):
-
 	# Init ObjectClass
 	sys.path.append('IBBFObjects')
 	ObjectClass = (importlib.import_module(object_classname))
@@ -25,18 +24,20 @@ def main(object_classname, CQModule, MQModule, TModule, alphabet_location, debug
 	sys.path.append('CQModules')
 	CQModule = (importlib.import_module(CQModule)).CQModule(ObjectClass, MQModule, parser, debugFlag, cqpara, testFlag)
 
+	DFSM = 0
+
 	# Algorithm
 	while 42 == 42:
 
 		tableModule.fixTable()
 		DFSM = tableModule.getDFSM()
 		counterexample = CQModule.isCorrect(DFSM)
-		
+
 		if counterexample is not "":
 			tableModule.addCounterexample(counterexample)
 			continue
 		break
-		
+
 	if not testFlag:
 		print "\n\n##################################\n# L* terminated succesfully!! :) #\n##################################"
 
@@ -62,8 +63,8 @@ def printHelp():
 	print "-eT\t\tExtended Timer for Modules"
 	sys.exit()
 
-def parseParameters():
 
+def parseParameters():
 	_TEST_ = 0
 	_DEBUG_ = 0
 	_extendedTimer_ = 0
@@ -86,42 +87,42 @@ def parseParameters():
 
 		if sys.argv[i] == '-t':
 			_TEST_ = 1
-			
+
 		if sys.argv[i] == '-A':
-			alphabet_location = sys.argv[i+1]
-		
+			alphabet_location = sys.argv[i + 1]
+
 		if sys.argv[i] == '-CQ':
-			CQModuleName = sys.argv[i+1]
-		
+			CQModuleName = sys.argv[i + 1]
+
 		if sys.argv[i] == '-MQ':
-			MQModuleName = sys.argv[i+1]
+			MQModuleName = sys.argv[i + 1]
 
 		if sys.argv[i] == '-TM':
-			TModuleName = sys.argv[i+1]
+			TModuleName = sys.argv[i + 1]
 
 		if sys.argv[i] == '-eT':
 			_extendedTimer_ = 1
 
 		if sys.argv[i] == '-cqp':
-			cqpara = sys.argv[i+1]
+			cqpara = sys.argv[i + 1]
 
 		if sys.argv[i] == '-mqp':
-			mqpara = sys.argv[i+1]
+			mqpara = sys.argv[i + 1]
 
 		if sys.argv[i] == '-tp':
-			tpara = sys.argv[i+1]
+			tpara = sys.argv[i + 1]
 
 		if sys.argv[i] == '-O':
-			object_classname = sys.argv[i+1]
+			object_classname = sys.argv[i + 1]
 
 	# Test parameter
 	if alphabet_location == "":
 		printHelp()
-	
+
 	if _TEST_ == 1:
 		startTesting()
 		sys.exit()
-	else:	
+	else:
 		# Start with timer
 		start_time = time.time()
 		main(object_classname, CQModuleName, MQModuleName, TModuleName, alphabet_location, _DEBUG_, _extendedTimer_, _TEST_, cqpara, mqpara, tpara)
@@ -129,8 +130,6 @@ def parseParameters():
 
 
 def startTesting():
-
-	results = ""
 
 	# Get CQModules:
 	CQModule_list = []
@@ -184,5 +183,6 @@ def startTesting():
 				print result
 
 	print "\nFinished, " + str(warnings) + " warnings and " + str(errors) + " errors."
+
 
 parseParameters()
