@@ -1,6 +1,7 @@
 import random
 import time
 from IBBFPrintModules import lstar_printer
+from IBBFPrintModules import lstar_drawer
 
 class CQModule:
 
@@ -8,7 +9,7 @@ class CQModule:
 	Init lstar instance
 	"""
 	def __init__(self, ObjectClass, MQModule, parser, debugFlag, params, testFlag):
-		
+
 		self._DEBUG_ = debugFlag
 		self._TIME_ = 0
 		self._TEST_ = testFlag
@@ -89,5 +90,6 @@ class CQModule:
 
 		self._TIME_ += time.time()-start_time
 		if not self._TEST_:
-			lstar_printer.LstarPrinter.printDFSM(DFSM, "Following is the correct DFSM", self.ObjectClass)
+			#lstar_printer.LstarPrinter.printDFSM(DFSM, "Following is the correct DFSM", self.ObjectClass)
+			lstar_drawer.LstarPrinter().drawDFSM(DFSM, "Following is the correct DFSM", self.ObjectClass)
 		return ''
