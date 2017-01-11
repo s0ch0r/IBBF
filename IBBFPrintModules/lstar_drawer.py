@@ -1,7 +1,6 @@
 import graphviz as gv
 from collections import defaultdict
 import os
-#from PIL import Image
 import webbrowser
 
 class LstarPrinter:
@@ -86,40 +85,34 @@ class LstarPrinter:
 
     def sanitize(self, string):
 
-        i = 0
-        j = 0
-
         list_org = string.split(',')
         list_org.sort()
         list_tmp = []
+        list_new = []
 
-        # Following Code makes summarizes characters (eg: a,b,c,d -> a-d)
+        # Following Code summarizes characters (eg: a,b,c,d -> a-d)
         # Automatically detects if only character are used.
-        condition = 1
         for e in list_org:
             if len(e) != 1:
                 list_tmp.append(e)
-                list_org.remove(e)
-        if condition:
-            list_new = []
+        for e in list_tmp:
+            list_org.remove(e)
 
-            i = 0
-            while i < len(list_org):
-                j = 1
-                while(42):
-                    if not(i+j == len(list_org)) and ord(list_org[i]) == ord(list_org[i+j])-j:
-                        j += 1
-                        continue
+        i = 0
+        while i < len(list_org):
+            j = 1
+            while(42):
+                if not(i+j == len(list_org)) and ord(list_org[i]) == ord(list_org[i+j])-j:
+                    j += 1
+                    continue
+                else:
+                    if j > 1:
+                        list_new.append(list_org[i] + "-" + list_org[i+j-1])
                     else:
-                        if j > 1:
-                            list_new.append(list_org[i] + "-" + list_org[i+j-1])
-                        else:
-                            list_new.append(list_org[i])
-                        break
-                i += j
-            list_new += list_tmp
-            string = ",".join(list_new)
-        else:
-            string = ",".join(list_org)
+                        list_new.append(list_org[i])
+                    break
+            i += j
+        list_new += list_tmp
+        string = ",".join(list_new)
 
         return string
