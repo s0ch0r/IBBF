@@ -2,12 +2,15 @@ import importlib
 import sys
 import time
 import os
+import getopt
 from APModules import alphabet_parser
 
 """
 Implements the l* algorithm, returns a DFSM
 """
-def main(object_classname, CQModule, MQModule, TModule, alphabet_location, debugFlag, timerFlag, testFlag, cqpara, mqpara, tpara):
+def main(object_classname, CQModule, MQModule, TModule, alphabet_location, debugFlag, timerFlag, testFlag, cqpara,
+		 mqpara, tpara, DFSM_output):
+
 	# Init ObjectClass
 	sys.path.append('IBBFObjects')
 	ObjectClass = (importlib.import_module(object_classname))
@@ -22,7 +25,7 @@ def main(object_classname, CQModule, MQModule, TModule, alphabet_location, debug
 	sys.path.append('TableModules')
 	tableModule = (importlib.import_module(TModule)).TableModule(ObjectClass, MQModule, A, debugFlag, tpara, testFlag)
 	sys.path.append('CQModules')
-	CQModule = (importlib.import_module(CQModule)).CQModule(ObjectClass, MQModule, parser, debugFlag, cqpara, testFlag)
+	CQModule = (importlib.import_module(CQModule)).CQModule(ObjectClass, MQModule, parser, debugFlag, cqpara, testFlag, DFSM_output)
 
 	DFSM = 0
 
@@ -54,13 +57,13 @@ def printHelp():
 	print "-d\t\tDebug Mode"
 	print "-t\t\tTest Mode"
 	print "-A\t\tAlphabet (eg \"abcdef\")"
-	print "-CQ\t\tConjecture Query - Module to be used"
-	print "-MQ\t\tMembership Query - Module to be used"
-	print "-TM\t\tTable - Module to be used"
-	print "-cqp\t\tParameters for CQModule"
-	print "-mqp\t\tParameters for MQModule"
-	print "-tmp\t\tParameters for Table Module"
-	print "-eT\t\tExtended Timer for Modules"
+	print "--CQ\t\tConjecture Query - Module to be used"
+	print "--MQ\t\tMembership Query - Module to be used"
+	print "--TM\t\tTable - Module to be used"
+	print "--cqp\t\tParameters for CQModule"
+	print "--mqp\t\tParameters for MQModule"
+	print "--tmp\t\tParameters for Table Module"
+	print "--eT\t\tExtended Timer for Modules"
 	sys.exit()
 
 
@@ -76,44 +79,59 @@ def parseParameters():
 	cqpara = 0
 	mqpara = 0
 	tpara = 0
+	DFSM_output = 0
+
+	opts = [('','')]
+
+	try:
+		opts, args = getopt.getopt(sys.argv[1:], 'hdtA:O:o:', ['help', 'CQ=', 'MQ=', 'TM=', 'eT', 'cqp=',
+																				  'mqp=', 'tmp='])
+	except getopt.GetoptError as err:
+		print str(err)
+		printHelp()
 
 	# Parse arguments
-	for i in range(1, len(sys.argv)):
-		if sys.argv[i] == '-h':
+	for opt, arg in opts:
+		if opt == ('-h', '--help'):
 			printHelp()
 
-		if sys.argv[i] == '-d':
+		elif opt == '-d':
 			_DEBUG_ = 1
 
-		if sys.argv[i] == '-t':
+		elif opt == '-t':
 			_TEST_ = 1
 
-		if sys.argv[i] == '-A':
-			alphabet_location = sys.argv[i + 1]
+		elif opt == '-A':
+			alphabet_location = arg
 
-		if sys.argv[i] == '-CQ':
-			CQModuleName = sys.argv[i + 1]
+		elif opt == '--CQ':
+			CQModuleName = arg
 
-		if sys.argv[i] == '-MQ':
-			MQModuleName = sys.argv[i + 1]
+		elif opt == '--MQ':
+			MQModuleName = arg
 
-		if sys.argv[i] == '-TM':
-			TModuleName = sys.argv[i + 1]
+		elif opt == '--TM':
+			TModuleName = arg
 
-		if sys.argv[i] == '-eT':
+		elif opt == '--eT':
 			_extendedTimer_ = 1
 
-		if sys.argv[i] == '-cqp':
-			cqpara = sys.argv[i + 1]
+		elif opt == '--cqp':
+			cqpara = arg
 
-		if sys.argv[i] == '-mqp':
-			mqpara = sys.argv[i + 1]
+		elif opt == '--mqp':
+			mqpara = arg
 
-		if sys.argv[i] == '-tp':
-			tpara = sys.argv[i + 1]
+		elif opt == '-tp':
+			tpara = arg
 
-		if sys.argv[i] == '-O':
-			object_classname = sys.argv[i + 1]
+		elif opt == '-O':
+			object_classname = arg
+
+		elif opt == '-o':
+			DFSM_output = arg
+		else:
+			assert False, "unhandled option"
 
 	# Test parameter
 	if alphabet_location == "":
@@ -125,27 +143,30 @@ def parseParameters():
 	else:
 		# Start with timer
 		start_time = time.time()
-		main(object_classname, CQModuleName, MQModuleName, TModuleName, alphabet_location, _DEBUG_, _extendedTimer_, _TEST_, cqpara, mqpara, tpara)
+		main(object_classname, CQModuleName, MQModuleName, TModuleName, alphabet_location, _DEBUG_, _extendedTimer_,
+			 _TEST_, cqpara, mqpara, tpara, DFSM_output)
 		print("\nExecution time: %s seconds " % (time.time() - start_time))
 
 
 def startTesting():
 
+	path = sys.path[0] + "/"  # Path to the project files
+
 	# Get CQModules:
 	CQModule_list = []
-	for filename in os.listdir("C:\_Daten\Daten\IBBF\CQModules"):
+	for filename in os.listdir(path + "CQModules"):
 		if filename.endswith(".py") and filename != "__init__.py":
 			CQModule_list.append(filename.split('.')[0])
 
 	# Get MQModules:
 	MQModule_list = []
-	for filename in os.listdir("C:\_Daten\Daten\IBBF\MQModules"):
+	for filename in os.listdir(path + "MQModules"):
 		if filename.endswith(".py") and filename != "__init__.py":
 			MQModule_list.append(filename.split('.')[0])
 
 	# Get TableModules:
 	TableModule_list = []
-	for filename in os.listdir("C:\_Daten\Daten\IBBF\TableModules"):
+	for filename in os.listdir(path + "TableModules"):
 		if filename.endswith(".py") and filename != "__init__.py":
 			TableModule_list.append(filename.split('.')[0])
 
@@ -171,7 +192,8 @@ def startTesting():
 					parameter['T'] = (importlib.import_module(TableModule).TableModule.getTestParameter())
 
 					# Test-Run
-					DFSM = main("basicObject", CQModule, MQModule, TableModule, "IBBFTestFiles/alphabet.txt", 0, 0, 1, parameter['CQ'], parameter['MQ'], parameter['T'])
+					DFSM = main("basicObject", CQModule, MQModule, TableModule, "IBBFTestFiles/alphabet.txt", 0, 0, 1,
+								parameter['CQ'], parameter['MQ'], parameter['T'])
 
 					# See if result seems to be correct
 					if len(DFSM[1]) != 2 or len(DFSM[2]) != 9 or len(DFSM[3]) != 77:

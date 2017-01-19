@@ -1,7 +1,8 @@
-import graphviz as gv
 from collections import defaultdict
 import os
 import webbrowser
+import importlib
+gv = (importlib.import_module('graphviz'))
 
 class LstarPrinter:
 
@@ -9,7 +10,9 @@ class LstarPrinter:
         # Nothing to do
         print ""
 
-    def drawDFSM(self, DFSM, description, ObjectClass):
+    def drawDFSM(self, DFSM, description, ObjectClass, filename):
+
+        filename = filename.split('.')
 
         initState = DFSM[0]
         finiteStates = DFSM[1]
@@ -38,9 +41,36 @@ class LstarPrinter:
 
         ttable = ttable_new
 
+        # Print to console
+        print "\n\n################################################\n" + description + "\n" \
+                  "################################################ "
+        # parse headline
+        headline = "\ntransition table"
+        for i in range(0, len(A)):
+            headline += "| " + ''.join(A[i].identifier) + "\t"
+
+        # parse line
+        line = ""
+        for i in range(0, len(A) + 2):
+            line += "--------"
+
+        # parse content
+        body = ""
+        for key in ttable:
+            body += " " + key + "\t-->\t"
+            for i in range(0, len(A)):
+                body += "| " + ttable[key][i] + "\t"
+            body += "\n"
+
+        print headline
+        print line
+        print body
+        print "\nInitial state: " + str(initState)
+        print "Final states: " + str(finiteStates)
+
 
         # init Machine object
-        g = gv.Digraph(format='png')
+        g = gv.Digraph(format=filename[1])
 
         # add states
         for t in ttable:
@@ -77,9 +107,9 @@ class LstarPrinter:
                 g.edge(t[0], stateTransTable[t], self.sanitize(t[1]))
 
         # draw DFSM
-        g.render('DFSM')
-        os.remove("DFSM")
-        webbrowser.open("DFSM.png")
+        g.render(filename[0])
+        os.remove(filename[0])
+        webbrowser.open('.'.join(filename))
 
         return 1
 

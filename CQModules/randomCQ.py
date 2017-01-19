@@ -1,18 +1,24 @@
 import random
 import time
 from IBBFPrintModules import lstar_printer
-from IBBFPrintModules import lstar_drawer
+try:
+	from IBBFPrintModules import lstar_drawer
+	drawer = 1
+except:
+	print "Unable to import drawer."
+	drawer = 0
 
 class CQModule:
 
 	"""
 	Init lstar instance
 	"""
-	def __init__(self, ObjectClass, MQModule, parser, debugFlag, params, testFlag):
+	def __init__(self, ObjectClass, MQModule, parser, debugFlag, params, testFlag, DFSM_output):
 
 		self._DEBUG_ = debugFlag
 		self._TIME_ = 0
 		self._TEST_ = testFlag
+		self.drawer_para = DFSM_output
 
 		self.MQModule = MQModule
 		self.Parser = parser
@@ -90,6 +96,8 @@ class CQModule:
 
 		self._TIME_ += time.time()-start_time
 		if not self._TEST_:
-			#lstar_printer.LstarPrinter.printDFSM(DFSM, "Following is the correct DFSM", self.ObjectClass)
-			lstar_drawer.LstarPrinter().drawDFSM(DFSM, "Following is the correct DFSM", self.ObjectClass)
+			if self.drawer_para != 0 and drawer != 0:
+				lstar_drawer.LstarPrinter().drawDFSM(DFSM, "Following is the correct DFSM", self.ObjectClass, self.drawer_para)
+			else:
+				lstar_printer.LstarPrinter.printDFSM(DFSM, "Following is the correct DFSM", self.ObjectClass)
 		return ''
